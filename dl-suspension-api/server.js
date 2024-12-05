@@ -12,7 +12,7 @@ app.use(express.json());
 // Public Routes
 app.use('/api/auth', authRoutes);
 
-// Protected Routes
+// Protected Route
 // app.use('/api/auth',verifyToken, authRoutes);
 
 app.listen(port, () => {
