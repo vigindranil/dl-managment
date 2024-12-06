@@ -3,6 +3,8 @@ import pool from '../db.js';
 import validateFields from '../utils/validators.js'; // Default import
 const router = express.Router();
 
+
+
 router.post('/create-rto-user', async (req, res) => {
   try {
     const {
@@ -104,8 +106,8 @@ router.get('/get-rto-user-details', async (req, res) => {
 
     // Check if the result contains data
     if (spResult && spResult.length > 0) {
-      const userDetails = spResult[0][0];  // Extract the user details from the result
-
+      const userDetails = spResult[0];  // Extract the user details from the result
+      console.log(userDetails);
       return res.json({
         status: 0,
         message: 'User details fetched successfully',
