@@ -35,19 +35,9 @@ const data = {
   },
   teams: [
     {
-      name: "User",
+      name: "RTO",
       logo: UserRound,
-      plan: "RTO",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
+      plan: "DL Suspension",
     },
   ],
   navMain: [

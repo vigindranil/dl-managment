@@ -17,6 +17,7 @@ import { FaRegEyeSlash } from "react-icons/fa6";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { FaCircleCheck } from "react-icons/fa6";
 import { ClipLoader } from "react-spinners";
+import {serviceUrl} from '@/app/constant';
 // import { useRouter } from 'next/router';
 
 export default function Home() {
@@ -44,28 +45,25 @@ export default function Home() {
 
     if (username && password) {
       try {
-        const response = await fetch("https://www.cloud2-api.site/api/login", {
+        const response = await fetch(serviceUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username,
-            password,
+            AuthorityUserName : username,
+            AuthorityPassword : password,
+            UserTypeID : 10
           }),
         });
 
         if (response.ok) {
           const decoded_data = await response.json();
-          decoded_data.data.user_id &&
-            sessionStorage.setItem("userId", decoded_data.data.user_id);
-          decoded_data.data.role &&
-            sessionStorage.setItem("userRole", decoded_data.data.role);
-          decoded_data.data.username &&
-            sessionStorage.setItem("username", decoded_data.data.username);
-          decoded_data.data.name &&
-            sessionStorage.setItem("name", decoded_data.data.name);
-
+          decoded_data.data.token &&
+            sessionStorage.setItem("token", decoded_data.token);
+          
+          console.log(decoded_data.token);
+          
           // const router = useRouter();
           router.push('/dashboard');
           // setLoggedIn("Logged In Successfull");
