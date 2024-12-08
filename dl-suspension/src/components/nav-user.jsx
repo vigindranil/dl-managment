@@ -11,11 +11,6 @@ import {
 } from "lucide-react"
 
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -40,15 +35,9 @@ export function NavUser() {
   const [user, setUser] = useState(null);
   const { isMobile } = useSidebar()
 
-  useEffect( () => {
-    try {
-      const parse_data = JSON.parse(decrypt(userDetails));
-      parse_data && setUser(parse_data[0]);
-     
-    } catch (error) {
-      console.error("Error parsing user details:", error);
-      setUser({});
-    }
+  useEffect(() => {
+    const parse_data = JSON.parse(decrypt(userDetails));
+    parse_data && setUser(parse_data);
   }, []);
 
   return (

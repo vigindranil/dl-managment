@@ -75,7 +75,13 @@ export default function Home() {
           const decoded_data = await response.json();
           dispatch(setToken(decoded_data?.token));
           dispatch(setUser(JSON.stringify(decoded_data?.data[0])));
-          router.push("/dashboard");
+
+          if (decoded_data?.status == 0){
+            router.push("/dashboard");
+          } else{
+            setLoggedIn(false);
+            setError("Invalid credentials");
+          }
 
         } else {
           const errorData = await response.json();
