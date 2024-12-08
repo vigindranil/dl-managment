@@ -3,19 +3,17 @@
 import * as React from "react"
 import {
   AudioWaveform,
-  BookOpen,
+  Car,
   Search,
   Command,
   Frame,
   UserRound,
   Map,
   PieChart,
-  Settings2,
   SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -29,15 +27,15 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: "User",
+    name: "RTO Authority User",
     email: "Alipurduar",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: UserRound,
   },
   teams: [
     {
-      name: "User",
-      logo: UserRound,
-      plan: "RTO",
+      name: "RTO Suspensions",
+      logo: Car,
+      plan: "Recommendation Portal",
     },
     {
       name: "Acme Corp.",
@@ -79,67 +77,23 @@ const data = {
       title: "DL Search",
       url: "#",
       icon: Search,
+      isActive: true,
       items: [
         {
           title: "By DL Number",
           url: "#",
         },
         {
-          title: "By Phone Number",
+          title: "By Vehicle Number",
           url: "#",
         },
-        // {
-        //   title: "Quantum",
-        //   url: "#",
-        // },
+        {
+          title: "By Challan Number",
+          url: "#",
+        },
       ],
     },
-    // {
-    //   title: "Documentation",
-    //   url: "#",
-    //   icon: BookOpen,
-    //   items: [
-    //     {
-    //       title: "Introduction",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Get Started",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Tutorials",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Changelog",
-    //       url: "#",
-    //     },
-    //   ],
-    // },
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: Settings2,
-    //   items: [
-    //     {
-    //       title: "General",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Team",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Billing",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Limits",
-    //       url: "#",
-    //     },
-    //   ],
-    // },
+   
   ],
   projects: [
     {
@@ -170,10 +124,9 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>)

@@ -23,7 +23,7 @@ export function NavMain({
 }) {
   return (
     (<SidebarGroup>
-      <SidebarGroupLabel>DL Suspension Process Application Portal
+      <SidebarGroupLabel>Menu
       </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
@@ -47,7 +47,7 @@ export function NavMain({
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
                         <a href={subItem.url}>
-                          <span>{subItem.title}</span>
+                          <span className="text-xs">{subItem.title}</span>
                         </a>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
