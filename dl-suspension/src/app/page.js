@@ -41,7 +41,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isInvalidUsername, setIsInvalidUsername] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
-  const [isInvalidAuthorityTypeID, setIsInvalidAuthorityTypeID] = useState(false);
+  const [isInvalidAuthorityTypeID, setIsInvalidAuthorityTypeID] =
+    useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
   const router = useRouter();
@@ -73,10 +74,24 @@ export default function Home() {
 
         if (response.ok) {
           const decoded_data = await response.json();
-          dispatch(setToken(decoded_data?.token));
-          dispatch(setUser(JSON.stringify(decoded_data?.data[0])));
-          router.push("/dashboard");
 
+          if (decoded_data?.status == 0) {
+            dispatch(setToken(decoded_data?.token));
+            dispatch(setUser(JSON.stringify(decoded_data?.data[0])));
+            // console.log(decoded_data);
+            if (authorityTypeID == 1) {
+              //State Admin
+              router.push("/admin-dashboard");
+            } else {
+              //RTO Login
+              router.push("/dashboard");
+            }
+          } else {
+            console.log("hii");
+
+            setError("Invalid Credentials");
+            setLoggedIn("");
+          }
         } else {
           const errorData = await response.json();
           setError(`${errorData.message}`);
@@ -143,7 +158,9 @@ export default function Home() {
                   </SelectContent>
                 </Select>
                 {isInvalidAuthorityTypeID && !authorityTypeID && (
-                  <p className="text-red-500 text-sm">Authority User Role is required!</p>
+                  <p className="text-red-500 text-sm">
+                    Authority User Role is required!
+                  </p>
                 )}
               </div>
               <div className="grid gap-1">

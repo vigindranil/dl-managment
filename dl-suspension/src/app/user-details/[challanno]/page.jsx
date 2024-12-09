@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import SidebarLayout from "@/components/sidebar-layout";
 import {
   Card,
@@ -17,7 +17,8 @@ import {
   CircleCheck,
   Camera,
   CircleUserRound,
-  IterationCcw
+  IterationCcw,
+  FileImage,
 } from "lucide-react";
 import Image from "next/image";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,9 +29,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Image as NextImage } from "next/image";
 
 const Page = ({ challanno }) => {
-
   const [token, setToken] = useState("");
   const [userData, setUserData] = useState({
     accused_name: "Test Accused",
@@ -93,15 +94,18 @@ const Page = ({ challanno }) => {
       offence_details: [
         {
           name: "184 MVA Driving Vehicle Dangerously #",
-          act: "184"
-        }
-      ]
+          act: "184",
+        },
+      ],
+      impounded_document: [],
+      vehicleImg: "",
+      vehicleImpoundImg: "",
+      docImpoundImg: "",
     },
   });
 
   return (
     <div className="p-6">
-      {/* <h2 className="text-lg font-bold mb-4">Params:{challanno}</h2> */}
       <h1 className="text-2xl font-bold mb-6">Challan Details</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -125,7 +129,11 @@ const Page = ({ challanno }) => {
             <div>
               <p className="text-sm text-muted-foreground">Date of Birth</p>
               <p className="font-medium">
-                {new Date(userData?.dob).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                {new Date(userData?.dob).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
               </p>
             </div>
             <div>
@@ -173,9 +181,7 @@ const Page = ({ challanno }) => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Driver Name</p>
-              <p className="font-medium">
-                {userData?.dl_details.driver_name}
-              </p>
+              <p className="font-medium">{userData?.dl_details.driver_name}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Relation Name</p>
@@ -184,17 +190,11 @@ const Page = ({ challanno }) => {
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Present Address
-              </p>
-              <p className="font-medium">
-                {userData?.dl_details.present_addr}
-              </p>
+              <p className="text-sm text-muted-foreground">Present Address</p>
+              <p className="font-medium">{userData?.dl_details.present_addr}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">
-                Permanent Address
-              </p>
+              <p className="text-sm text-muted-foreground">Permanent Address</p>
               <p className="font-medium">
                 {userData?.dl_details.permanent_addr}
               </p>
@@ -202,26 +202,28 @@ const Page = ({ challanno }) => {
             <div>
               <p className="text-sm text-muted-foreground">Date of Birth</p>
               <p className="font-medium">
-                {new Date(userData?.dl_details?.dob).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                {new Date(userData?.dl_details?.dob).toLocaleDateString(
+                  "en-GB",
+                  { day: "2-digit", month: "2-digit", year: "numeric" }
+                )}
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Blood Group</p>
-              <p className="font-medium">
-                {userData?.dl_details.blood_group}
-              </p>
+              <p className="font-medium">{userData?.dl_details.blood_group}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Issue Date</p>
               <p className="font-medium">
-                {new Date(userData?.dl_details?.issue_date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                {new Date(userData?.dl_details?.issue_date).toLocaleDateString(
+                  "en-GB",
+                  { day: "2-digit", month: "2-digit", year: "numeric" }
+                )}
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Valid Until</p>
-              <p className="font-medium">
-                {userData?.dl_details.valid_upto}
-              </p>
+              <p className="font-medium">{userData?.dl_details.valid_upto}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Gender</p>
@@ -231,9 +233,7 @@ const Page = ({ challanno }) => {
               <p className="text-sm text-muted-foreground">
                 Vehicle Description
               </p>
-              <p className="font-medium">
-                {userData?.dl_details.vehicle_desc}
-              </p>
+              <p className="font-medium">{userData?.dl_details.vehicle_desc}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Vehicle Class</p>
@@ -283,7 +283,12 @@ const Page = ({ challanno }) => {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Color</p>
-              <p className="font-medium">{userData?.vehicle.color} <span className={`w-4 h-4 bg-${userData?.vehicle?.color.toLowerCase()}-600 rounded-full bg-slate-300  inline-block`}></span></p>
+              <p className="font-medium">
+                {userData?.vehicle.color}{" "}
+                <span
+                  className={`w-4 h-4 bg-${userData?.vehicle?.color.toLowerCase()}-600 rounded-full bg-slate-300  inline-block`}
+                ></span>
+              </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">
@@ -336,7 +341,9 @@ const Page = ({ challanno }) => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Challan Place</p>
-                <p className="font-medium">{userData?.challan?.challan_place}</p>
+                <p className="font-medium">
+                  {userData?.challan?.challan_place}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">State Code</p>
@@ -351,8 +358,12 @@ const Page = ({ challanno }) => {
                 <p className="font-medium">{userData?.challan?.officer_name}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Officer Designation</p>
-                <p className="font-medium">{userData?.challan?.officer_designation}</p>
+                <p className="text-sm text-muted-foreground">
+                  Officer Designation
+                </p>
+                <p className="font-medium">
+                  {userData?.challan?.officer_designation}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Vehicle Number</p>
@@ -376,7 +387,15 @@ const Page = ({ challanno }) => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Challan Status</p>
-                <p className="font-medium">{(userData?.challan?.challan_status).toUpperCase() == "PENDING" ? (<Clock className="w-4 h-4 text-yellow-500 inline" />) : (<CircleCheck className="w-4 h-4 text-emerald-500 inline" />)} {userData?.challan?.challan_status}</p>
+                <p className="font-medium">
+                  {(userData?.challan?.challan_status).toUpperCase() ==
+                  "PENDING" ? (
+                    <Clock className="w-4 h-4 text-yellow-500 inline" />
+                  ) : (
+                    <CircleCheck className="w-4 h-4 text-emerald-500 inline" />
+                  )}{" "}
+                  {userData?.challan?.challan_status}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Department</p>
@@ -384,16 +403,92 @@ const Page = ({ challanno }) => {
               </div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-2">Offence Details</p>
+              <p className="text-sm text-muted-foreground mb-2">
+                Offence Details
+              </p>
               {userData?.challan?.offence_details.map((offence, index) => (
                 <div key={index} className="mb-2">
                   <p className="font-medium">{offence.name}</p>
-                  <p className="text-sm text-muted-foreground">Act: {offence.act}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Act: {offence.act}
+                  </p>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
+
+        {/* Challan Impound Documents Card */}
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileImage className="h-5 w-5" />
+              Challan Impound Documents
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Impounded Documents
+                </p>
+                <p className="font-medium">
+                  {userData.challan.impounded_document &&
+                  userData.challan.impounded_document.length > 0
+                    ? userData.challan.impounded_document.join(", ")
+                    : "None"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Vehicle Image</p>
+                {userData.challan.vehicleImg ? (
+                  <Image
+                    src={`data:image/jpeg;base64,${userData.challan.vehicleImg}`}
+                    alt="Vehicle"
+                    width={200}
+                    height={150}
+                    className="mt-2 rounded-md"
+                  />
+                ) : (
+                  <p className="font-medium">Not available</p>
+                )}
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Vehicle Impound Image
+                </p>
+                {userData.challan.vehicleImpoundImg ? (
+                  <Image
+                    src={`data:image/jpeg;base64,${userData.challan.vehicleImpoundImg}`}
+                    alt="Vehicle Impound"
+                    width={200}
+                    height={150}
+                    className="mt-2 rounded-md"
+                  />
+                ) : (
+                  <p className="font-medium">Not available</p>
+                )}
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  Document Impound Image
+                </p>
+                {userData.challan.docImpoundImg ? (
+                  <Image
+                    src={`data:image/jpeg;base64,${userData.challan.docImpoundImg}`}
+                    alt="Document Impound"
+                    width={200}
+                    height={150}
+                    className="mt-2 rounded-md"
+                  />
+                ) : (
+                  <p className="font-medium">Not available</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Recommendation Card */}
         <Card className="md:col-span-2">
           <CardHeader>
@@ -415,10 +510,7 @@ const Page = ({ challanno }) => {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="hearing-type"
-                  className="text-sm font-medium"
-                >
+                <label htmlFor="hearing-type" className="text-sm font-medium">
                   Recommended Hearing Type
                 </label>
                 <Select>

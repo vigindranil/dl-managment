@@ -38,12 +38,13 @@ import { decrypt } from "@/utils/crypto";
 export function NavUser() {
   const userDetails = useSelector((state) => state.auth.user);
   const [user, setUser] = useState(null);
+  
   const { isMobile } = useSidebar()
 
   useEffect( () => {
     try {
       const parse_data = JSON.parse(decrypt(userDetails));
-      parse_data && setUser(parse_data[0]);
+      setUser(parse_data);
      
     } catch (error) {
       console.error("Error parsing user details:", error);

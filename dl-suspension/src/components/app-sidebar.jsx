@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
   Car,
@@ -11,41 +11,26 @@ import {
   Map,
   PieChart,
   SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // This is sample data.
 const data = {
-  user: {
-    name: "RTO Authority User",
-    email: "Alipurduar",
-    avatar: UserRound,
-  },
   teams: [
     {
       name: "RTO Suspensions",
       logo: Car,
       plan: "Recommendation Portal",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
     },
   ],
   navMain: [
@@ -54,6 +39,7 @@ const data = {
       url: "#",
       icon: SquareTerminal,
       isActive: true,
+      type: 10,
       items: [
         {
           title: "Recommended Suspensions",
@@ -78,6 +64,7 @@ const data = {
       url: "#",
       icon: Search,
       isActive: true,
+      type: 10,
       items: [
         {
           title: "By DL Number",
@@ -93,32 +80,26 @@ const data = {
         },
       ],
     },
-   
-  ],
-  projects: [
     {
-      name: "Design Engineering",
+      title: "Admin Operations",
       url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      icon: Search,
+      isActive: true,
+      type: 1,
+      items: [
+        {
+          title: "Create RTO User",
+          url: "#",
+        },
+      
+      ],
     },
   ],
-}
+};
 
-export function AppSidebar({
-  ...props
-}) {
+export function AppSidebar({ ...props }) {
   return (
-    (<Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
@@ -129,6 +110,6 @@ export function AppSidebar({
         <NavUser />
       </SidebarFooter>
       <SidebarRail />
-    </Sidebar>)
+    </Sidebar>
   );
 }
