@@ -17,17 +17,36 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { decrypt } from "@/utils/crypto";
+
+
 
 export function NavMain({
   items
 }) {
+  const userDetails = useSelector((state) => state.auth.user);
+const [user, setUser] = useState(null);
+
+
+useEffect(() => {
+  try {
+    const parse_data = JSON.parse(decrypt(userDetails));
+    setUser(parse_data);
+  } catch (error) {
+    console.error("Error parsing user details:", error);
+    setUser({});
+  }
+}, []);
   return (
     (<SidebarGroup>
-      <SidebarGroupLabel>DL Suspension Process Application Portal
+      <SidebarGroupLabel>Menu
       </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
-          <Collapsible
+          item.type == user?.AuthorityUserID && 
+          (<Collapsible
             key={item.title}
             asChild
             defaultOpen={item.isActive}
@@ -47,7 +66,7 @@ export function NavMain({
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
                         <a href={subItem.url}>
-                          <span>{subItem.title}</span>
+                          <span className="text-xs">{subItem.title}</span>
                         </a>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
@@ -55,7 +74,8 @@ export function NavMain({
                 </SidebarMenuSub>
               </CollapsibleContent>
             </SidebarMenuItem>
-          </Collapsible>
+          </Collapsible>)
+                
         ))}
       </SidebarMenu>
     </SidebarGroup>)
