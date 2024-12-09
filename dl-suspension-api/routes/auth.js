@@ -37,20 +37,12 @@ router.post("/login", async (req, res) => {
       AuthorityPassword,
       UserTypeID,
     ]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({
-        status: 1,
-        message: "Invalid username or password",
-        data: null,
-      });
-    }
-
-    // Generate JWT token
+    if (rows[0].length !== 0) {
+      // Generate JWT token
     const token = jwt.sign(
       { id: rows[0]["AuthorityID"], name: rows[0]["AuthorityName"] }, // Payload (custom claims)
       JWT_SECRET, // Secret key
-      { expiresIn: "3h" } // Token expiry
+      { expiresIn: "3h" } //Token expiry
     );
 
     res.json({
@@ -59,6 +51,17 @@ router.post("/login", async (req, res) => {
       data: rows[0],
       token: token,
     });
+      
+    }
+    else{
+      return res.status(404).json({
+        status: 1,
+        message: "Invalid user.",
+        data: null,
+      });
+    }
+
+    
   } catch (error) {
     console.error("Error fetching state information:", error);
     res.status(500).json({

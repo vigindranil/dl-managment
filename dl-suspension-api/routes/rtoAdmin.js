@@ -107,7 +107,7 @@ router.get('/get-rto-user-details', async (req, res) => {
     // Check if the result contains data
     if (spResult && spResult.length > 0) {
       const userDetails = spResult[0];  // Extract the user details from the result
-      console.log(userDetails);
+      //console.log(userDetails);
       return res.json({
         status: 0,
         message: 'User details fetched successfully',
