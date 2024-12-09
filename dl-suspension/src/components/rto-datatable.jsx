@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   flexRender,
   getCoreRowModel,
@@ -9,10 +9,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, ChevronDown, CookingPot, MoreHorizontal, Trash2, UserRoundPen, UserRoundPenIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useSelector } from "react-redux";
+import { decrypt } from "@/utils/crypto";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -33,131 +36,96 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { serviceUrl } from "@/app/constant"
 
 const data = [
-    {
-        id: "m5gr84i9",
-        name: "Abhijit Basu",
-        status: "pending",
-        challan_no: 8669869,
-        dl_number: "DL1234567890",
-        vehicle_number: "WB01A1234",
-        contact_number: "9876543210",
-      },
-      {
-        id: "3u1reuv4",
-        name: "Pallab Rudra",
-        status: "processed",
-        challan_no: 7858756,
-        dl_number: "DL0987654321",
-        vehicle_number: "WB02B5678",
-        contact_number: "9123456780",
-      },
-      {
-        id: "derv1ws0",
-        name: "Akash Singh",
-        status: "offline",
-        challan_no: 76767879,
-        dl_number: "DL5678901234",
-        vehicle_number: "KA03C9012",
-        contact_number: "9876501234",
-      },
-      {
-        id: "5kma53ae",
-        name: "Millen",
-        status: "online",
-        challan_no: 395435438,
-        dl_number: "DL6789012345",
-        vehicle_number: "MH04D3456",
-        contact_number: "9123451234",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Aziza",
-        status: "failed",
-        challan_no: 758678787,
-        dl_number: "DL1234560987",
-        vehicle_number: "TN05E7890",
-        contact_number: "9001234567",
-      },
+  {
+    id: "m5gr84i9",
+    name: "Abhijit Basu",
+    status: "pending",
+    Username: 8669869,
+    dl_number: "DL1234567890",
+    vehicle_number: "WB01A1234",
+    contact_number: "9876543210",
+  },
+  {
+    id: "3u1reuv4",
+    name: "Pallab Rudra",
+    status: "processed",
+    Username: 7858756,
+    dl_number: "DL0987654321",
+    vehicle_number: "WB02B5678",
+    contact_number: "9123456780",
+  },
+  {
+    id: "derv1ws0",
+    name: "Akash Singh",
+    status: "offline",
+    Username: 76767879,
+    dl_number: "DL5678901234",
+    vehicle_number: "KA03C9012",
+    contact_number: "9876501234",
+  },
+  {
+    id: "5kma53ae",
+    name: "Millen",
+    status: "online",
+    Username: 395435438,
+    dl_number: "DL6789012345",
+    vehicle_number: "MH04D3456",
+    contact_number: "9123451234",
+  },
+  {
+    id: "bhqecj4p",
+    name: "Aziza",
+    status: "failed",
+    Username: 758678787,
+    dl_number: "DL1234560987",
+    vehicle_number: "TN05E7890",
+    contact_number: "9001234567",
+  },
 ]
 
 export const columns = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-      className="text-white border-white"
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "status",
-    header: () => <div className="text-left text-white">Status</div>,
-    cell: ({ row }) => (
-      <div className="text-left"><Badge className={`${row.getValue("status") == 'pending' ? 'bg-yellow-200'  : row.getValue("status") == 'processed' ? 'bg-emerald-200' : row.getValue("status") == 'online' ? 'bg-sky-200' : row.getValue("status") == 'failed' ? 'bg-red-200' : 'bg-slate-200'} text-slate-500 hover:text-white rounded-full`}>{row.getValue("status")}</Badge></div>
-    ),
-  },
-  {
-    accessorKey: "challan_no",
-    header: () => <div className="text-left text-white">Challan Number</div>,
+    accessorKey: "Username",
+    header: () => <div className="text-left text-white">Username</div>,
     cell: ({ row }) => {
-      const challan_no = row.getValue("challan_no"); // Retrieve the text value
-      return <div className="text-left font-medium">{challan_no}</div>;
-    },    
+      const Username = row.getValue("Username"); // Retrieve the text value
+      return <div className="text-left font-medium">{Username}</div>;
+    },
   },
   {
-    accessorKey: "name",
+    accessorKey: "FullName",
     header: () => <div className="text-left text-white">Full Name</div>,
     cell: ({ row }) => {
-      const name = row.getValue("name"); // Retrieve the text value
-      return <div className="text-left font-medium">{name}</div>;
-    },    
-  },
-  {
-    accessorKey: "dl_number",
-    header: () => <div className="text-left text-white">DL Number</div>,
-    cell: ({ row }) => {
-      const dlNumber = row.getValue("dl_number")
-      return <div className="text-left">{dlNumber}</div>
+      const FullName = row.getValue("FullName"); // Retrieve the text value
+      return <div className="text-left font-medium">{FullName}</div>;
     },
   },
   {
-    accessorKey: "vehicle_number",
-    header: () => <div className="text-left text-white">Vehicle Number</div>,
+    accessorKey: "UserPassword",
+    header: () => <div className="text-left text-white">User Password</div>,
     cell: ({ row }) => {
-      const vehicleNumber = row.getValue("vehicle_number")
-      return <div className="text-left">{vehicleNumber}</div>
+      const UserPassword = row.getValue("UserPassword")
+      return <div className="text-left">{UserPassword}</div>
     },
   },
   {
-    accessorKey: "contact_number",
-    header: () => <div className="text-left text-white">Contact Number</div>,
+    accessorKey: "ContactNo",
+    header: () => <div className="text-left text-white">Contact No.</div>,
     cell: ({ row }) => {
-      const contactNumber = row.getValue("contact_number")
-      return <div className="text-left">{contactNumber}</div>
+      const ContactNo = row.getValue("ContactNo")
+      return <div className="text-left">{ContactNo}</div>
     },
   },
   {
+    accessorKey: "Action",
+    header: () => <div className="text-left text-white">Action</div>,
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const challan_no = row.getValue("challan_no")
+      const Username = row.getValue("Username")
 
       return (
         <DropdownMenu>
@@ -170,13 +138,13 @@ export const columns = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
-              <Link href={`/user-details/${challan_no}`}>
-                View Details
+              <Link href={`#`} className="text-yellow-500 font-bold">
+
+                <UserRoundPen className="inline w-4 h-4 stroke-[3]" /> Edit 
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Online Hearing</DropdownMenuItem>
-            <DropdownMenuItem>Offline Hearing</DropdownMenuItem>
+            <DropdownMenuItem className="text-red-800 font-bold"><Trash2 className="inline w-4 h-4 stroke-[3]" /> Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -189,9 +157,37 @@ function RTODataTable() {
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [rowSelection, setRowSelection] = useState({})
+  const authToken = useSelector((state) => state.auth.token);
+  const [token, setToken] = useState(null);
+  const [apiData, setApiData] = useState([]);
 
+  useEffect(() => {
+    const parse_token = decrypt(authToken);
+    setToken(parse_token);
+    token && getRTOUsers();
+  }, [token]);
+  async function getRTOUsers() {
+    try {
+        const myHeaders = new Headers();
+        console.log("token: ", token);
+        myHeaders.append("Authorization", `Bearer ${token}`);
+        const requestOptions = {
+          method: "GET",
+          headers: myHeaders,
+          redirect: "follow"
+        };
+        await fetch(`${serviceUrl}get-rto-user-details?UserID=0`, requestOptions)
+          .then((response) => response.json())
+          .then((result) => {console.log(result.data)
+            setApiData(result.data);
+          })
+          .catch((error) => console.error(error));
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
   const table = useReactTable({
-    data,
+    data: apiData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -211,13 +207,13 @@ function RTODataTable() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold mb-6">DL Recommended Suspensions</h1>
+      <h1 className="text-2xl font-bold mb-6">RTO Users</h1>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter challan no..."
-          value={table.getColumn("challan_no")?.getFilterValue() || ""}
+          placeholder="Filter Username, Fullname, Contact No..."
+          value={table.getColumn("Username")?.getFilterValue() || ""}
           onChange={(event) =>
-            table.getColumn("challan_no")?.setFilterValue(event.target.value)
+            table.getColumn("Username")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -259,9 +255,9 @@ function RTODataTable() {
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}
