@@ -45,7 +45,7 @@ useEffect(() => {
       </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
-          item.type == user?.AuthorityUserID && 
+          item.type == user?.AuthorityUserTypeID && 
           (<Collapsible
             key={item.title}
             asChild
