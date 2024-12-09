@@ -7,6 +7,7 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  UserRound
 } from "lucide-react"
 
 import {
@@ -29,11 +30,27 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { decrypt } from "@/utils/crypto";
 
-export function NavUser({
-  user
-}) {
+export function NavUser() {
+  const userDetails = useSelector((state) => state.auth.user);
+  const [user, setUser] = useState(null);
+  
   const { isMobile } = useSidebar()
+
+  useEffect( () => {
+    try {
+      const parse_data = JSON.parse(decrypt(userDetails));
+      setUser(parse_data);
+     
+    } catch (error) {
+      console.error("Error parsing user details:", error);
+      setUser({});
+    }
+  }, []);
 
   return (
     (<SidebarMenu>
@@ -43,13 +60,12 @@ export function NavUser({
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-              </Avatar>
+              <div className="bg-slate-300 rounded-full p-2">
+                <UserRound className="size-4 bg-slate-300 text-white" />
+              </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-semibold">{user?.AuthorityName}</span>
+                <span className="truncate text-xs">{user?.AuthorityUserName}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -61,13 +77,12 @@ export function NavUser({
             sideOffset={4}>
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
+                <div className="bg-slate-300 rounded-full p-2">
+                  <UserRound className="size-4 bg-slate-300 text-white" />
+                </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-semibold">{user?.AuthorityName}</span>
+                  <span className="truncate text-xs">{user?.AuthorityUserName}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -78,26 +93,13 @@ export function NavUser({
                 Upgrade to Pro
               </DropdownMenuItem> */}
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            {/* <DropdownMenuGroup>
+
+            <Link href="/logout" className="bg-primary">
               <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+                <LogOut />
+                Logout
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

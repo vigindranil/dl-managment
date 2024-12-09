@@ -1,1 +1,1 @@
-export const serviceUrl = "http://localhost:3001/api/auth/login"
+export const serviceUrl = 'http://localhost:3001/api/';

@@ -31,6 +31,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 const data = [
     {
@@ -45,7 +47,7 @@ const data = [
       {
         id: "3u1reuv4",
         name: "Pallab Rudra",
-        status: "success",
+        status: "processed",
         challan_no: 7858756,
         dl_number: "DL0987654321",
         vehicle_number: "WB02B5678",
@@ -85,6 +87,7 @@ export const columns = [
     id: "select",
     header: ({ table }) => (
       <Checkbox
+      className="text-white border-white"
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
@@ -105,29 +108,22 @@ export const columns = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: () => <div className="text-left text-white">Status</div>,
     cell: ({ row }) => (
-      <div className="text-left capitalize">{row.getValue("status")}</div>
+      <div className="text-left"><Badge className={`${row.getValue("status") == 'pending' ? 'bg-yellow-200'  : row.getValue("status") == 'processed' ? 'bg-emerald-200' : row.getValue("status") == 'online' ? 'bg-sky-200' : row.getValue("status") == 'failed' ? 'bg-red-200' : 'bg-slate-200'} text-slate-500 hover:text-white rounded-full`}>{row.getValue("status")}</Badge></div>
     ),
   },
   {
     accessorKey: "challan_no",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          challan no
-          <ArrowUpDown />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="text-left lowercase">{row.getValue("challan_no")}</div>,
+    header: () => <div className="text-left text-white">Challan Number</div>,
+    cell: ({ row }) => {
+      const challan_no = row.getValue("challan_no"); // Retrieve the text value
+      return <div className="text-left font-medium">{challan_no}</div>;
+    },    
   },
   {
     accessorKey: "name",
-    header: () => <div className="text-left">Name</div>,
+    header: () => <div className="text-left text-white">Full Name</div>,
     cell: ({ row }) => {
       const name = row.getValue("name"); // Retrieve the text value
       return <div className="text-left font-medium">{name}</div>;
@@ -135,7 +131,7 @@ export const columns = [
   },
   {
     accessorKey: "dl_number",
-    header: "DL Number",
+    header: () => <div className="text-left text-white">DL Number</div>,
     cell: ({ row }) => {
       const dlNumber = row.getValue("dl_number")
       return <div className="text-left">{dlNumber}</div>
@@ -143,7 +139,7 @@ export const columns = [
   },
   {
     accessorKey: "vehicle_number",
-    header: "Vehicle Number",
+    header: () => <div className="text-left text-white">Vehicle Number</div>,
     cell: ({ row }) => {
       const vehicleNumber = row.getValue("vehicle_number")
       return <div className="text-left">{vehicleNumber}</div>
@@ -151,7 +147,7 @@ export const columns = [
   },
   {
     accessorKey: "contact_number",
-    header: "Contact Number",
+    header: () => <div className="text-left text-white">Contact Number</div>,
     cell: ({ row }) => {
       const contactNumber = row.getValue("contact_number")
       return <div className="text-left">{contactNumber}</div>
@@ -161,7 +157,7 @@ export const columns = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
+      const challan_no = row.getValue("challan_no")
 
       return (
         <DropdownMenu>
@@ -173,14 +169,14 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
+            <DropdownMenuItem>
+              <Link href={`/user-details/${challan_no}`}>
+                View Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>Online Hearing</DropdownMenuItem>
+            <DropdownMenuItem>Offline Hearing</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -215,6 +211,7 @@ function DataTableDemo() {
 
   return (
     <div className="w-full">
+      <h1 className="text-2xl font-bold mb-6">DL Recommended Suspensions</h1>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter challan no..."
@@ -253,7 +250,7 @@ function DataTableDemo() {
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-primary text-white">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -275,6 +272,7 @@ function DataTableDemo() {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
+                  className="hover:bg-muted"
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >

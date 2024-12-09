@@ -1,5 +1,4 @@
-"use client"
-import SidebarLayout from "@/components/sidebar-layout";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -7,17 +6,9 @@ import {
   CardTitle,
   CardFooter,
 } from "@/components/ui/card";
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Wifi,
-  WifiOff,
-  CircleArrowRight,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Wifi, WifiOff , CircleArrowRight  } from "lucide-react";
 import Link from "next/link";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const page = () => {
 const [token, setToken] = useState("");
@@ -29,9 +20,8 @@ const [token, setToken] = useState("");
   }, []);
   return (
     <div>
-      <SidebarLayout>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
-          <Card>
+          <Card className="border-l-yellow-300 border-l-2">
             <CardHeader className="flex flex-row items-center space-y-0 pb-2">
               <CardTitle className="text-lg font-bold text-slate-500">
                 Recommended Suspensions
@@ -39,9 +29,6 @@ const [token, setToken] = useState("");
               <AlertCircle className="w-8 h-8 ml-auto text-yellow-500" />
             </CardHeader>
             <CardContent>
-              {/* <p className="text-sm text-muted-foreground">
-                View and manage recommended suspensions.
-              </p> */}
               <h1 className="text-5xl font-medium">10</h1>
             </CardContent>
             <CardFooter>
@@ -54,12 +41,12 @@ const [token, setToken] = useState("");
             </CardFooter>
           </Card>
 
-          <Card>
+          <Card className="border-l-emerald-300 border-l-2">
             <CardHeader className="flex flex-row items-center space-y-0 pb-2">
               <CardTitle className="text-lg font-bold text-slate-500">
                 Processed Suspensions
               </CardTitle>
-              <CheckCircle2 className="w-8 h-8 ml-auto text-green-600 " />
+              <CheckCircle2 className="w-8 h-8 ml-auto text-emerald-500" />
             </CardHeader>
             <CardContent>
               <h1 className="text-5xl">35</h1>
@@ -75,12 +62,12 @@ const [token, setToken] = useState("");
           </Card>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
-          <Card>
+          <Card className="border-l-sky-300 border-l-2">
             <CardHeader className="flex flex-row items-center space-y-0 pb-2">
               <CardTitle className="text-lg font-bold text-slate-500">
                 Online Hearings
               </CardTitle>
-              <Wifi className="w-8 h-8 ml-auto text-blue-500 " />
+              <Wifi className="w-8 h-8 ml-auto text-blue-500" />
             </CardHeader>
             <CardContent>
               <h1 className="text-5xl">54</h1>
@@ -95,12 +82,12 @@ const [token, setToken] = useState("");
             </CardFooter>
           </Card>
 
-          <Card>
+          <Card className="border-l-rose-300 border-l-2">
             <CardHeader className="flex flex-row items-center space-y-0 pb-2">
               <CardTitle className="text-lg font-bold text-slate-500">
                 Offline Hearings
               </CardTitle>
-              <WifiOff className="w-8 h-8 ml-auto text-slate-400 " />
+              <WifiOff className="w-8 h-8 ml-auto text-red-400" />
             </CardHeader>
             <CardContent>
               <h1 className="text-5xl">24</h1>
@@ -115,7 +102,6 @@ const [token, setToken] = useState("");
             </CardFooter>
           </Card>
         </div>
-      </SidebarLayout>
     </div>
   );
 };
