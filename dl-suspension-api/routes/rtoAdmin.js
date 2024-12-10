@@ -11,6 +11,7 @@ router.post('/create-rto-user', async (req, res) => {
       UserID,
       Username,
       UserPassword,
+      
       FullName,
       ContactNo,
       RtoID,
@@ -124,6 +125,40 @@ router.get('/get-rto-user-details', async (req, res) => {
 
   } catch (error) {
     console.error('Error while fetching RTO user details:', error);
+    return res.status(500).json({
+      status: 1,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+});
+router.get('/get-all-rto-list', async (res) => {
+  try {
+    // Call the stored procedure
+    const [spResult] = await pool.query(
+      'CALL sp_getAllRTODetails();' // Execute the stored procedure
+    );
+    console.log(spResult.length);
+    // Check if the result contains data
+    if (spResult && spResult.length > 0) {
+      const rtoList = spResult[0]; // Extract the RTO details from the result
+      console.log(rtoList);
+      return res.json({
+        status: 0,
+        message: 'RTO list fetched successfully.',
+        data: rtoList,
+      });
+    } else {
+      // If no data is found
+      return res.status(404).json({
+        status: 1,
+        message: 'Failed to fetch RTO list.',
+        data: null,
+      });
+    }
+
+  } catch (error) {
+    console.error('Error while fetching RTO list:', error);
     return res.status(500).json({
       status: 1,
       message: 'Internal server error',
