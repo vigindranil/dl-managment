@@ -137,18 +137,16 @@ router.get('/get-rto-user-details', async (req, res) => {
     });
   }
 });
-router.get('/get-all-rto-list', async (res) => {
+router.get('/get-all-rto-list', async (req, res) => {
   try {
     // Call the stored procedure
     const [spResult] = await pool.query(
       'CALL sp_getAllRTODetails();' // Execute the stored procedure
     );
-    console.log(spResult.length);
     // Check if the result contains data
-    if (spResult && spResult.length > 0) {
+    if (spResult && spResult[0].length > 0) {
       const rtoList = spResult[0]; // Extract the RTO details from the result
-      console.log(rtoList);
-      return res.json({
+      return res.status(200).json({
         status: 0,
         message: 'RTO list fetched successfully.',
         data: rtoList,
@@ -159,18 +157,19 @@ router.get('/get-all-rto-list', async (res) => {
         status: 1,
         message: 'Failed to fetch RTO list.',
         data: null,
+
       });
     }
 
   } catch (error) {
-    console.error('Error while fetching RTO list:', error);
+    console.error(error);
     return res.status(500).json({
       status: 1,
       message: 'Internal server error',
       data: null,
     });
+    return error;
   }
 });
-
 
 export default router;
