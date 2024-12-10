@@ -50,7 +50,6 @@ router.post('/create-rto-user', async (req, res) => {
     const errorCode = errorCodeResult[0].ErrorCode;
     console.error(errorCode)
     // Extract the ErrorCode from the result
-
     // Handle ErrorCode
     switch (errorCode) {
       case 0:
@@ -65,6 +64,12 @@ router.post('/create-rto-user', async (req, res) => {
           message: 'Username already exists',
           data: null,
         });
+        case 3:
+          return res.status(409).json({
+            status: 1,
+            message: 'RTO code does not exist',
+            data: null,
+          });
       default:
         return res.status(500).json({
           status: 1,
