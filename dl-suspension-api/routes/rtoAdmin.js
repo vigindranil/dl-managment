@@ -171,5 +171,72 @@ router.get('/get-all-rto-list', async (req, res) => {
     return error;
   }
 });
+router.get('/get-dl-suspension-recommendation-details', async (req, res) => {
+  try {
+    const { RTOCode, ChallanNumber, DLStatus } = req.query;
+
+    // Validate required fields using the validateFields function
+    try {
+      validateFields(req.query, ['RTOCode', 'ChallanNumber', 'DLStatus']);
+    } catch (error) {
+      return res.status(400).json({
+        status: 1,
+        message: error.message,
+        data: null,
+      });
+    }
+
+    // Fetch data from the database
+    const dbResults = await pool.query(
+      'CALL sp_getDLSuspensionRecommendationDetails(?,?,?);',
+      [RTOCode, ChallanNumber, DLStatus]
+    );
+
+    // Check if dbResults is valid
+    if (!dbResults || dbResults.length === 0 || !dbResults[0]) {
+      return res.status(404).json({
+        status: 1,
+        message: 'No data found',
+        data: null,
+      });
+    }
+
+    const rawData = dbResults[0]; // Assuming the result is an array
+
+    // Transform the raw data safely
+    const cleanData = rawData
+      .filter(record => record && record["0"]) // Ensure each record and `record["0"]` exist
+      .map(record => {
+        const offences = Object.values(record)
+          .filter(item => item && item.OffenceName && item.OffenceAct) // Ensure item is valid and has OffenceName & OffenceAct
+          .map(offence => ({
+            OffenceName: offence.OffenceName,
+            OffenceAct: offence.OffenceAct,
+          }));
+
+        return {
+          ...record["0"], // Spread the data from record["0"]
+          OffenceDetails: offences,
+        };
+      });
+
+    // Send the response
+    return res.json({
+      status: 0,
+      message: 'Details fetched successfully.',
+      data: cleanData, // Return the transformed data
+    });
+  } catch (error) {
+    console.error('Error while fetching DL suspension recommendation details:', error);
+    return res.status(500).json({
+      status: 1,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+});
+
+
+
 
 export default router;
