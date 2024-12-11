@@ -1,4 +1,0 @@
-{
-  "/(state-admin)/admin-dashboard/page": "app/(state-admin)/admin-dashboard/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
-}

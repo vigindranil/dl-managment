@@ -25,6 +25,17 @@ import { FaAt } from "react-icons/fa6";
 import { FaUser, FaPhone, FaMapMarkerAlt } from "react-icons/fa";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function CardWithInputs() {
   const [token, setToken] = useState(null);
@@ -37,6 +48,8 @@ export default function CardWithInputs() {
   const [contactNo, setContactNo] = useState("");
   const [rtoPreference, setRtoPreference] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [rtoOptions, setRtoOptions] = useState([]);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const [error, setError] = useState("");
 
@@ -48,12 +61,42 @@ export default function CardWithInputs() {
   const router = useRouter();
 
   useEffect(() => {
-    const parse_data = decrypt(userToken);
-    parse_data && setToken(parse_data);
+    const auth_data = decrypt(userToken);
+    setToken(auth_data);
 
     const user_data = JSON.parse(decrypt(userDetails));
-    user_data && setUser(user_data);
-  }, []);
+    setUser(user_data);
+
+    token && rtoDropDown();
+  }, [token]);
+  console.log("id", token);
+
+  const rtoDropDown = async () => {
+    try {
+      console.log("token", token);
+      if (!token) {
+        console.error("Token is not available");
+        return;
+      }
+
+      const response = await fetch(`${serviceUrl}get-all-rto-list`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const result = await response.json();
+
+        setRtoOptions(result.data);
+      } else {
+        console.error("Failed to fetch RTO options");
+      }
+    } catch (error) {
+      console.error("Error fetching RTO options:", error);
+    }
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -92,7 +135,7 @@ export default function CardWithInputs() {
 
           if (decoded_data?.status == 0) {
             console.log("user created");
-            router.push("/admin-dashboard");
+            setShowSuccessDialog(true);
           } else {
             console.log("User not created");
 
@@ -109,6 +152,12 @@ export default function CardWithInputs() {
     }
     setIsLoading(false);
   };
+
+  const handleSuccessDialogAction = () => {
+    setShowSuccessDialog(false);
+    router.push("/admin-dashboard");
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="w-[500px]">
@@ -214,9 +263,11 @@ export default function CardWithInputs() {
                       <SelectValue placeholder="Select RTO preference" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="WB-07">WB-07</SelectItem>
-                      <SelectItem value="RTO002">RTO002</SelectItem>
-                      <SelectItem value="RTO003">RTO003</SelectItem>
+                      {rtoOptions.map((option, index) => (
+                        <SelectItem key={index} value={option?.RTOCode}>
+                          {option?.RTOName}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <div className="bg-slate-200 px-3 ring-ring rounded-s-none rounded-e-md border-input flex items-center">
@@ -251,6 +302,22 @@ export default function CardWithInputs() {
           </Button>
         </CardFooter>
       </Card>
+      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>User created successfully</AlertDialogTitle>
+            <AlertDialogDescription>
+              The new user account has been created. Click OK to go to the admin
+              dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleSuccessDialogAction}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

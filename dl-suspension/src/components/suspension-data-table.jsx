@@ -169,14 +169,11 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Link href={`/user-details/${challan_no}`}>
-                View Details
-              </Link>
-            </DropdownMenuItem>
+            <DropdownMenuItem><Link href={`/user-details/${challan_no}`}>View Details</Link></DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Online Hearing</DropdownMenuItem>
-            <DropdownMenuItem>Offline Hearing</DropdownMenuItem>
+            <DropdownMenuItem><Link href={`/user-details/${challan_no}`}> Online Hearing </Link></DropdownMenuItem>
+            <DropdownMenuItem><Link href={`/user-details/${challan_no}`}> Offline Hearing </Link></DropdownMenuItem>
+            <DropdownMenuItem><Link href={`/user-details/${challan_no}`}> Process without Hearing </Link></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

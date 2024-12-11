@@ -520,6 +520,7 @@ const Page = ({ challanno }) => {
                   <SelectContent>
                     <SelectItem value="online">Online Hearing</SelectItem>
                     <SelectItem value="offline">Offline Hearing</SelectItem>
+                    <SelectItem value="without">Process without Hearing</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

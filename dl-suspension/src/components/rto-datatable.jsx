@@ -38,53 +38,6 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { serviceUrl } from "@/app/constant"
 
-const data = [
-  {
-    id: "m5gr84i9",
-    name: "Abhijit Basu",
-    status: "pending",
-    Username: 8669869,
-    dl_number: "DL1234567890",
-    vehicle_number: "WB01A1234",
-    contact_number: "9876543210",
-  },
-  {
-    id: "3u1reuv4",
-    name: "Pallab Rudra",
-    status: "processed",
-    Username: 7858756,
-    dl_number: "DL0987654321",
-    vehicle_number: "WB02B5678",
-    contact_number: "9123456780",
-  },
-  {
-    id: "derv1ws0",
-    name: "Akash Singh",
-    status: "offline",
-    Username: 76767879,
-    dl_number: "DL5678901234",
-    vehicle_number: "KA03C9012",
-    contact_number: "9876501234",
-  },
-  {
-    id: "5kma53ae",
-    name: "Millen",
-    status: "online",
-    Username: 395435438,
-    dl_number: "DL6789012345",
-    vehicle_number: "MH04D3456",
-    contact_number: "9123451234",
-  },
-  {
-    id: "bhqecj4p",
-    name: "Aziza",
-    status: "failed",
-    Username: 758678787,
-    dl_number: "DL1234560987",
-    vehicle_number: "TN05E7890",
-    contact_number: "9001234567",
-  },
-]
 
 export const columns = [
   {
@@ -322,4 +275,9 @@ function RTODataTable() {
     </div>
   )
 }
+
+function deleteUser(){
+
+}
+
 export default RTODataTable;
