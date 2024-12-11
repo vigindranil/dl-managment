@@ -202,29 +202,32 @@ router.get('/get-dl-suspension-recommendation-details', async (req, res) => {
     }
 
     const rawData = dbResults[0]; // Assuming the result is an array
-
-    // Transform the raw data safely
-    const cleanData = rawData
-      .filter(record => record && record["0"]) // Ensure each record and `record["0"]` exist
-      .map(record => {
-        const offences = Object.values(record)
-          .filter(item => item && item.OffenceName && item.OffenceAct) // Ensure item is valid and has OffenceName & OffenceAct
-          .map(offence => ({
-            OffenceName: offence.OffenceName,
-            OffenceAct: offence.OffenceAct,
-          }));
-
-        return {
-          ...record["0"], // Spread the data from record["0"]
-          OffenceDetails: offences,
+    const groupedData = rawData[0].reduce((acc, record) => {
+      const { DLNumber, OffenceName, OffenceAct, ...otherDetails } = record;
+    
+      if (!acc[DLNumber]) {
+        // Initialize a new group for this DLNumber
+        acc[DLNumber] = {
+          ...otherDetails, // Copy all other details (assumed common per DLNumber)
+          DLNumber,
+          OffenceDetails: [], // Create an array to store offences
         };
-      });
+      }
+    
+      // Add the offence details to the group
+      acc[DLNumber].OffenceDetails.push({ OffenceName, OffenceAct });
+    
+      return acc;
+    }, {});
+    
+    // Convert the grouped object into an array
+    const groupedArray = Object.values(groupedData);
 
     // Send the response
     return res.json({
       status: 0,
       message: 'Details fetched successfully.',
-      data: cleanData, // Return the transformed data
+      data: groupedArray, // Return the transformed data
     });
   } catch (error) {
     console.error('Error while fetching DL suspension recommendation details:', error);
