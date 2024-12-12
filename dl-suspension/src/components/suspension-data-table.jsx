@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
+import React, { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,11 +8,11 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -21,8 +21,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -30,64 +30,22 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import Link from "next/link"
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { useSelector } from "react-redux";
+import { decrypt } from "@/utils/crypto";
+import { useEffect } from "react";
+import { serviceUrl } from "@/app/constant";
 
-const data = [
-    {
-        id: "m5gr84i9",
-        name: "Abhijit Basu",
-        status: "pending",
-        challan_no: 8669869,
-        dl_number: "DL1234567890",
-        vehicle_number: "WB01A1234",
-        contact_number: "9876543210",
-      },
-      {
-        id: "3u1reuv4",
-        name: "Pallab Rudra",
-        status: "processed",
-        challan_no: 7858756,
-        dl_number: "DL0987654321",
-        vehicle_number: "WB02B5678",
-        contact_number: "9123456780",
-      },
-      {
-        id: "derv1ws0",
-        name: "Akash Singh",
-        status: "offline",
-        challan_no: 76767879,
-        dl_number: "DL5678901234",
-        vehicle_number: "KA03C9012",
-        contact_number: "9876501234",
-      },
-      {
-        id: "5kma53ae",
-        name: "Millen",
-        status: "online",
-        challan_no: 395435438,
-        dl_number: "DL6789012345",
-        vehicle_number: "MH04D3456",
-        contact_number: "9123451234",
-      },
-      {
-        id: "bhqecj4p",
-        name: "Aziza",
-        status: "failed",
-        challan_no: 758678787,
-        dl_number: "DL1234560987",
-        vehicle_number: "TN05E7890",
-        contact_number: "9001234567",
-      },
-]
+
 
 export const columns = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-      className="text-white border-white"
+        className="text-white border-white"
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
@@ -107,57 +65,73 @@ export const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "status",
+    accessorKey: "ChallanStatus",
     header: () => <div className="text-left text-white">Status</div>,
     cell: ({ row }) => (
-      <div className="text-left"><Badge className={`${row.getValue("status") == 'pending' ? 'bg-yellow-200'  : row.getValue("status") == 'processed' ? 'bg-emerald-200' : row.getValue("status") == 'online' ? 'bg-sky-200' : row.getValue("status") == 'failed' ? 'bg-red-200' : 'bg-slate-200'} text-slate-500 hover:text-white rounded-full`}>{row.getValue("status")}</Badge></div>
+      <div className="text-left">
+        <Badge
+          className={`${
+            row.getValue("ChallanStatus") == "Pending"
+              ? "bg-yellow-200"
+              : row.getValue("ChallanStatus") == "Processed"
+              ? "bg-emerald-200"
+              : row.getValue("ChallanStatus") == "Online"
+              ? "bg-sky-200"
+              : row.getValue("ChallanStatus") == "Failed"
+              ? "bg-red-200"
+              : "bg-slate-200"
+          } text-slate-500 hover:text-white rounded-full`}
+        >
+          {row.getValue("ChallanStatus")}
+        </Badge>
+      </div>
     ),
   },
   {
-    accessorKey: "challan_no",
+    accessorKey: "ChallanNumber",
     header: () => <div className="text-left text-white">Challan Number</div>,
     cell: ({ row }) => {
-      const challan_no = row.getValue("challan_no"); // Retrieve the text value
-      return <div className="text-left font-medium">{challan_no}</div>;
-    },    
+      const ChallanNumber = row.getValue("ChallanNumber"); // Retrieve the text value
+      return <div className="text-left font-medium">{ChallanNumber}</div>;
+    },
   },
   {
-    accessorKey: "name",
+    accessorKey: "AccusedName",
     header: () => <div className="text-left text-white">Full Name</div>,
     cell: ({ row }) => {
-      const name = row.getValue("name"); // Retrieve the text value
-      return <div className="text-left font-medium">{name}</div>;
-    },    
+      const AccusedName = row.getValue("AccusedName"); // Retrieve the text value
+      return <div className="text-left font-medium">{AccusedName}</div>;
+    },
   },
   {
-    accessorKey: "dl_number",
+    accessorKey: "DLNumber",
     header: () => <div className="text-left text-white">DL Number</div>,
     cell: ({ row }) => {
-      const dlNumber = row.getValue("dl_number")
-      return <div className="text-left">{dlNumber}</div>
+      const dlNumber = row.getValue("DLNumber");
+      return <div className="text-left">{dlNumber}</div>;
     },
   },
   {
-    accessorKey: "vehicle_number",
+    accessorKey: "VehicleNumber",
     header: () => <div className="text-left text-white">Vehicle Number</div>,
     cell: ({ row }) => {
-      const vehicleNumber = row.getValue("vehicle_number")
-      return <div className="text-left">{vehicleNumber}</div>
+      const vehicleNumber = row.getValue("VehicleNumber");
+      return <div className="text-left">{vehicleNumber}</div>;
     },
   },
   {
-    accessorKey: "contact_number",
+    accessorKey: "ContactNumber",
     header: () => <div className="text-left text-white">Contact Number</div>,
     cell: ({ row }) => {
-      const contactNumber = row.getValue("contact_number")
-      return <div className="text-left">{contactNumber}</div>
+      const contactNumber = row.getValue("ContactNumber");
+      return <div className="text-left">{contactNumber}</div>;
     },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const challan_no = row.getValue("challan_no")
+      const ChallanNumber = row.getValue("ChallanNumber");
 
       return (
         <DropdownMenu>
@@ -170,28 +144,83 @@ export const columns = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
-              <Link href={`/user-details/${challan_no}`}>
-                View Details
-              </Link>
+              <Link href={`/user-details/${ChallanNumber}`}>View Details</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Online Hearing</DropdownMenuItem>
-            <DropdownMenuItem>Offline Hearing</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/user-details/${ChallanNumber}`}> Online Hearing </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/user-details/${ChallanNumber}`}>
+                {" "}
+                Offline Hearing{" "}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/user-details/${ChallanNumber}`}>
+                {" "}
+                Process without Hearing{" "}
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
 
 function DataTableDemo() {
-  const [sorting, setSorting] = useState([])
-  const [columnFilters, setColumnFilters] = useState([])
-  const [columnVisibility, setColumnVisibility] = useState({})
-  const [rowSelection, setRowSelection] = useState({})
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState({});
+  const authToken = useSelector((state) => state.auth.token);
+  const [token, setToken] = useState(null);
+  const userDetails = useSelector((state) => state.auth.user);
+  const [user, setUser] = useState(null);
+  const [apiData, setApiData] = useState([]);
+
+  useEffect(() => {
+    const parse_token = decrypt(authToken);
+    setToken(parse_token);
+
+    token && dlSuspensionRecommendedUser();
+
+    const user_data = JSON.parse(decrypt(userDetails));
+    setUser(user_data);
+  }, [token,userDetails]);
+  console.log(token);
+  console.log(user);
+
+  async function dlSuspensionRecommendedUser() {
+    console.log("hii");
+
+    try {
+      const myHeaders = new Headers();
+      console.log("token: ", token);
+      myHeaders.append("Authorization", `Bearer ${token}`);
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+      await fetch(
+        `${serviceUrl}get-dl-suspension-recommendation-details?RTOCode=WB-07&ChallanNumber=0&DLStatus=0`,
+        requestOptions
+      )
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result.data);
+          setApiData(result.data  || []);
+        })
+        .catch((error) => console.error(error));
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
   const table = useReactTable({
-    data,
+    data: apiData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -207,7 +236,7 @@ function DataTableDemo() {
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full">
@@ -215,9 +244,9 @@ function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter challan no..."
-          value={table.getColumn("challan_no")?.getFilterValue() || ""}
+          value={table.getColumn("ChallanNumber")?.getFilterValue() || ""}
           onChange={(event) =>
-            table.getColumn("challan_no")?.setFilterValue(event.target.value)
+            table.getColumn("ChallanNumber")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -243,7 +272,7 @@ function DataTableDemo() {
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -263,7 +292,7 @@ function DataTableDemo() {
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -324,6 +353,6 @@ function DataTableDemo() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 export default DataTableDemo;

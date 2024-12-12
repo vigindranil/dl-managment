@@ -16,8 +16,9 @@ const layout = () => {
     setUser(userDetails);
   }, []);
   const breadcrumb = [
-    { href: "#", name: "RTO Authority" },
-    { href: "/dashboard", name: "Dashboard" }
+    { href: "#", name: "State Authority" },
+    { href: "/admin-dashboard", name: "Dashboard" },
+    { href: "#", name: "Create RTO User" }
   ];
 
   return (
