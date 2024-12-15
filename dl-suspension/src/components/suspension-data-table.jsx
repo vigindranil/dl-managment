@@ -37,6 +37,7 @@ import { useSelector } from "react-redux";
 import { decrypt } from "@/utils/crypto";
 import { useEffect } from "react";
 import { serviceUrl } from "@/app/constant";
+import Loading from "@/app/dl-suspensions/loading";
 
 
 
@@ -183,8 +184,10 @@ function DataTableDemo() {
   useEffect(() => {
     const parse_token = decrypt(authToken);
     setToken(parse_token);
-
-    token && dlSuspensionRecommendedUser();
+    setTimeout(() => {
+      token && dlSuspensionRecommendedUser();
+    }, 3000);
+    
 
     const user_data = JSON.parse(decrypt(userDetails));
     setUser(user_data);
@@ -193,9 +196,9 @@ function DataTableDemo() {
   console.log(user);
 
   async function dlSuspensionRecommendedUser() {
-    console.log("hii");
-
+  
     try {
+      setApiData([]);
       const myHeaders = new Headers();
       console.log("token: ", token);
       myHeaders.append("Authorization", `Bearer ${token}`);
@@ -211,7 +214,8 @@ function DataTableDemo() {
         .then((response) => response.json())
         .then((result) => {
           console.log(result.data);
-          setApiData(result.data  || []);
+          setApiData(result.data || []);
+          
         })
         .catch((error) => console.error(error));
     } catch (error) {
@@ -241,6 +245,7 @@ function DataTableDemo() {
   return (
     <div className="w-full">
       <h1 className="text-2xl font-bold mb-6">DL Recommended Suspensions</h1>
+      
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter challan no..."
@@ -278,6 +283,7 @@ function DataTableDemo() {
         </DropdownMenu>
       </div>
       <div className="rounded-md border">
+      {apiData.length == 0 ? <Loading /> : (
         <Table>
           <TableHeader className="bg-primary text-white">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -327,6 +333,7 @@ function DataTableDemo() {
             )}
           </TableBody>
         </Table>
+        )}
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">

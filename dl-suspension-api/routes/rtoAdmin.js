@@ -11,6 +11,7 @@ router.post('/create-rto-user', async (req, res) => {
       UserID,
       Username,
       UserPassword,
+      
       FullName,
       ContactNo,
       RtoID,
@@ -49,7 +50,6 @@ router.post('/create-rto-user', async (req, res) => {
     const errorCode = errorCodeResult[0].ErrorCode;
     console.error(errorCode)
     // Extract the ErrorCode from the result
-
     // Handle ErrorCode
     switch (errorCode) {
       case 0:
@@ -64,6 +64,12 @@ router.post('/create-rto-user', async (req, res) => {
           message: 'Username already exists',
           data: null,
         });
+        case 3:
+          return res.status(409).json({
+            status: 1,
+            message: 'RTO code does not exist',
+            data: null,
+          });
       default:
         return res.status(500).json({
           status: 1,
@@ -107,7 +113,7 @@ router.get('/get-rto-user-details', async (req, res) => {
     // Check if the result contains data
     if (spResult && spResult.length > 0) {
       const userDetails = spResult[0];  // Extract the user details from the result
-      console.log(userDetails);
+      //console.log(userDetails);
       return res.json({
         status: 0,
         message: 'User details fetched successfully',
@@ -131,6 +137,109 @@ router.get('/get-rto-user-details', async (req, res) => {
     });
   }
 });
+router.get('/get-all-rto-list', async (req, res) => {
+  try {
+    // Call the stored procedure
+    const [spResult] = await pool.query(
+      'CALL sp_getAllRTODetails();' // Execute the stored procedure
+    );
+    // Check if the result contains data
+    if (spResult && spResult[0].length > 0) {
+      const rtoList = spResult[0]; // Extract the RTO details from the result
+      return res.status(200).json({
+        status: 0,
+        message: 'RTO list fetched successfully.',
+        data: rtoList,
+      });
+    } else {
+      // If no data is found
+      return res.status(404).json({
+        status: 1,
+        message: 'Failed to fetch RTO list.',
+        data: null,
+
+      });
+    }
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: 1,
+      message: 'Internal server error',
+      data: null,
+    });
+    return error;
+  }
+});
+router.get('/get-dl-suspension-recommendation-details', async (req, res) => {
+  try {
+    const { RTOCode, ChallanNumber, DLStatus } = req.query;
+
+    // Validate required fields using the validateFields function
+    try {
+      validateFields(req.query, ['RTOCode', 'ChallanNumber', 'DLStatus']);
+    } catch (error) {
+      return res.status(400).json({
+        status: 1,
+        message: error.message,
+        data: null,
+      });
+    }
+
+    // Fetch data from the database
+    const dbResults = await pool.query(
+      'CALL sp_getDLSuspensionRecommendationDetails(?,?,?);',
+      [RTOCode, ChallanNumber, DLStatus]
+    );
+
+    // Check if dbResults is valid
+    if (!dbResults || dbResults.length === 0 || !dbResults[0]) {
+      return res.status(404).json({
+        status: 1,
+        message: 'No data found',
+        data: null,
+      });
+    }
+
+    const rawData = dbResults[0]; // Assuming the result is an array
+    const groupedData = rawData[0].reduce((acc, record) => {
+      const { DLNumber, OffenceName, OffenceAct, ...otherDetails } = record;
+    
+      if (!acc[DLNumber]) {
+        // Initialize a new group for this DLNumber
+        acc[DLNumber] = {
+          ...otherDetails, // Copy all other details (assumed common per DLNumber)
+          DLNumber,
+          OffenceDetails: [], // Create an array to store offences
+        };
+      }
+    
+      // Add the offence details to the group
+      acc[DLNumber].OffenceDetails.push({ OffenceName, OffenceAct });
+    
+      return acc;
+    }, {});
+    
+    // Convert the grouped object into an array
+    const groupedArray = Object.values(groupedData);
+
+    // Send the response
+    return res.json({
+      status: 0,
+      message: 'Details fetched successfully.',
+      data: groupedArray, // Return the transformed data
+    });
+  } catch (error) {
+    console.error('Error while fetching DL suspension recommendation details:', error);
+    return res.status(500).json({
+      status: 1,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+});
+
+
 
 
 export default router;

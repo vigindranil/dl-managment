@@ -1,11 +1,23 @@
-import React from 'react'
+import React from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 
 const loading = () => {
   return (
-    <div>
-      loading...
-    </div>
-  )
-}
+    <div className="p-4 space-y-4">
+    {Array.from({ length: 5 }).map((_, index) => (
+      <div key={index} className="flex space-x-4">
+        <Skeleton className="h-6 w-1/6" />
+        <Skeleton className="h-6 w-1/6" />
+        <Skeleton className="h-6 w-1/6" />
+        <Skeleton className="h-6 w-1/6" />
+        <Skeleton className="h-6 w-1/6" />
+        <Skeleton className="h-6 w-1/6" />
+      </div>
+    ))}
+  </div>
+  );
+};
 
-export default loading
+export default loading;
