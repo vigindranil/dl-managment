@@ -1,10 +1,10 @@
 import React from "react";
 import DataTableDemo from "@/components/suspension-data-table";
 
-const page = () => {
+const page = ({ type }) => {
   return (
     <div className="p-10">
-      <DataTableDemo></DataTableDemo>
+      <DataTableDemo type={type}></DataTableDemo>
     </div>
   );
 };

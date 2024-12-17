@@ -3,7 +3,8 @@ import Page from "./page";
 import Loading from "./loading";
 import SidebarLayout from "@/components/sidebar-layout";
 
-const layout = () => {
+const layout = async ({ params }) => {
+  const { type } = await params;
   const breadcrumb = [
     { href: "#", name: "RTO Authority" },
     { href: "/dashboard", name: "Dashboard" },
@@ -13,7 +14,7 @@ const layout = () => {
   return (
     <SidebarLayout breadcrumb={breadcrumb}>
       <Suspense fallback={<Loading />}>
-        <Page/>
+        <Page type={type} />
       </Suspense>
     </SidebarLayout>
   );

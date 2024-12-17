@@ -299,7 +299,7 @@ function RTODataTable() {
       const response = await fetch(`${serviceUrl}get-all-rto-list`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json", 
           authorization: `Bearer ${token}`,
         },
       });

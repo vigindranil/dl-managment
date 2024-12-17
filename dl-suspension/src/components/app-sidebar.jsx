@@ -1,18 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  AudioWaveform,
-  Car,
-  Search,
-  Command,
-  Frame,
-  UserRound,
-  Map,
-  PieChart,
-  SquareTerminal,
-} from "lucide-react";
-
+import { Car, Search, BadgeCheck } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -36,26 +25,26 @@ const data = {
   navMain: [
     {
       title: "DL Recommendation",
-      url: "#",
-      icon: SquareTerminal,
+      url: "/dl-suspensions",
+      icon: BadgeCheck,
       isActive: true,
       type: 10,
       items: [
         {
           title: "Recommended Suspensions",
-          url: "#",
+          url: "/dl-suspensions/1",
         },
         {
           title: "Processed Suspensions",
-          url: "#",
+          url: "/dl-suspensions/4",
         },
         {
           title: "Online Hearings",
-          url: "#",
+          url: "/dl-suspensions/3",
         },
         {
           title: "Offline Hearings",
-          url: "#",
+          url: "/dl-suspensions/2",
         },
       ],
     },
@@ -68,11 +57,7 @@ const data = {
       items: [
         {
           title: "By DL Number",
-          url: "#",
-        },
-        {
-          title: "By Vehicle Number",
-          url: "#",
+          url: "/dl-search",
         },
         {
           title: "By Challan Number",
@@ -91,7 +76,6 @@ const data = {
           title: "Create RTO User",
           url: "/create-rto-user",
         },
-      
       ],
     },
   ],

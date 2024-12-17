@@ -37,9 +37,7 @@ import { useSelector } from "react-redux";
 import { decrypt } from "@/utils/crypto";
 import { useEffect } from "react";
 import { serviceUrl } from "@/app/constant";
-import Loading from "@/app/dl-suspensions/loading";
-
-
+import Loading from "@/app/dl-suspensions/[type]/loading";
 
 export const columns = [
   {
@@ -66,27 +64,39 @@ export const columns = [
     enableHiding: false,
   },
   {
-    accessorKey: "ChallanStatus",
+    accessorKey: "ChallanStatusID",
     header: () => <div className="text-left text-white">Status</div>,
-    cell: ({ row }) => (
-      <div className="text-left">
-        <Badge
-          className={`${
-            row.getValue("ChallanStatus") == "Pending"
-              ? "bg-yellow-200"
-              : row.getValue("ChallanStatus") == "Processed"
-              ? "bg-emerald-200"
-              : row.getValue("ChallanStatus") == "Online"
-              ? "bg-sky-200"
-              : row.getValue("ChallanStatus") == "Failed"
-              ? "bg-red-200"
-              : "bg-slate-200"
-          } text-slate-500 hover:text-white rounded-full`}
-        >
-          {row.getValue("ChallanStatus")}
-        </Badge>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const status = row.getValue("ChallanStatusID");
+
+      // Mapping numeric IDs to status labels
+      const statusLabels = {
+        1: "Pending",
+        2: "Offline",
+        3: "Online",
+        4: "Processed",
+      };
+
+      return (
+        <div className="text-left">
+          <Badge
+            className={`${
+              status == "1"
+                ? "bg-yellow-200"
+                : status == "4"
+                ? "bg-emerald-200"
+                : status == "3"
+                ? "bg-sky-200"
+                : status == "2"
+                ? "bg-red-200"
+                : "bg-slate-200"
+            } text-slate-500 hover:text-white rounded-full`}
+          >
+            {statusLabels[status] || "Unknown"}
+          </Badge>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "ChallanNumber",
@@ -133,6 +143,7 @@ export const columns = [
     enableHiding: false,
     cell: ({ row }) => {
       const ChallanNumber = row.getValue("ChallanNumber");
+      const DlNumber = row.getValue("DLNumber");
 
       return (
         <DropdownMenu>
@@ -144,23 +155,10 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Link href={`/user-details/${ChallanNumber}`}>View Details</Link>
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Link href={`/user-details/${ChallanNumber}`}> Online Hearing </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/user-details/${ChallanNumber}`}>
-                {" "}
-                Offline Hearing{" "}
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/user-details/${ChallanNumber}`}>
-                {" "}
-                Process without Hearing{" "}
+              <Link href={`/user-details/${ChallanNumber}/${DlNumber}`}>
+                View Details
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -170,7 +168,7 @@ export const columns = [
   },
 ];
 
-function DataTableDemo() {
+function DataTableDemo({ type }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -184,19 +182,14 @@ function DataTableDemo() {
   useEffect(() => {
     const parse_token = decrypt(authToken);
     setToken(parse_token);
-    setTimeout(() => {
-      token && dlSuspensionRecommendedUser();
-    }, 3000);
-    
+    token && dlSuspensionRecommendedUser();
 
     const user_data = JSON.parse(decrypt(userDetails));
     setUser(user_data);
-  }, [token,userDetails]);
-  console.log(token);
-  console.log(user);
+  }, [token, userDetails]);
+  console.log("hi 2", apiData);
 
   async function dlSuspensionRecommendedUser() {
-  
     try {
       setApiData([]);
       const myHeaders = new Headers();
@@ -207,19 +200,19 @@ function DataTableDemo() {
         headers: myHeaders,
         redirect: "follow",
       };
-      await fetch(
-        `${serviceUrl}get-dl-suspension-recommendation-details?RTOCode=WB-07&ChallanNumber=0&DLStatus=0`,
+      const response = await fetch(
+        `${serviceUrl}get-dl-suspension-recommendation-details?RTOCode=41&ChallanNumber=0&DLStatus=${type}`,
         requestOptions
-      )
-        .then((response) => response.json())
-        .then((result) => {
-          console.log(result.data);
-          setApiData(result.data || []);
-          
-        })
-        .catch((error) => console.error(error));
+      );
+
+      const result = await response.json();
+      result?.data && result?.data?.length == 0
+        ? setApiData("")
+        : setApiData(result.data);
+      console.log("hi", result.data);
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
+      setApiData(null);
     }
   }
 
@@ -244,8 +237,18 @@ function DataTableDemo() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold mb-6">DL Recommended Suspensions</h1>
-      
+      <h1 className="text-2xl font-bold mb-6">
+        {type == 1
+          ? "DL Recommended Suspensions"
+          : type == 2
+          ? "Offline Hearing"
+          : type == 3
+          ? "Online Hearing"
+          : type == 4
+          ? "Processed Hearing"
+          : "DL Recommended Suspensions"}
+      </h1>
+
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter challan no..."
@@ -283,62 +286,90 @@ function DataTableDemo() {
         </DropdownMenu>
       </div>
       <div className="rounded-md border">
-      {apiData.length == 0 ? <Loading /> : (
-        <Table>
-          <TableHeader className="bg-primary text-white">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  className="hover:bg-muted"
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+        {apiData === "" ? (
+          // Case: apiData is null -> Show "No Data Found"
+          <Table>
+            <TableHeader className="bg-primary text-white">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
+              ))}
+            </TableHeader>
+            <TableBody>
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
+                <TableCell colSpan="100%" className="h-24 text-center">
+                  No Data Found.
                 </TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        ) : apiData && apiData?.length === 0 ? (
+          // Case: apiData is an empty array -> Show Loader
+          <Loading />
+        ) : (
+          // Case: apiData has data -> Show Table with Data
+          <Table>
+            <TableHeader className="bg-primary text-white">
+              {table?.getHeaderGroups()?.map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table?.getRowModel()?.rows &&
+                table?.getRowModel()?.rows?.length > 0 &&
+                table?.getRowModel()?.rows?.map((row) => (
+                  <TableRow
+                    className="hover:bg-muted"
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
         )}
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table?.getFilteredSelectedRowModel()?.rows &&
+            table?.getFilteredSelectedRowModel()?.rows?.length}{" "}
+          of{" "}
+          {table?.getFilteredRowModel()?.rows &&
+            table?.getFilteredRowModel()?.rows?.length}{" "}
+          row(s) selected.
         </div>
         <div className="space-x-2">
           <Button
