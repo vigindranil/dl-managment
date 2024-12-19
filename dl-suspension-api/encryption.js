@@ -1,8 +1,7 @@
-// const crypto = require("crypto");
 import crypto from "crypto";
 
 const key = 'kfkdfbdkfbd79879898798fakfdkf456'; // key provided by the NIC
-export function AESEncryption(plaintext) {
+export const AESEncryption = (plaintext) => {
     const algorithm = "aes-256-cbc";
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv(algorithm, Buffer.from(key, 'utf8'), iv);
