@@ -42,7 +42,6 @@ app.use('/api/sarthi', sarthiRoutes);
 // Protected Route
 app.use('/api/',verifyToken, rtoAdmin);
 
-
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
