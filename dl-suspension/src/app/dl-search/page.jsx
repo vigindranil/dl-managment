@@ -7,6 +7,8 @@ import { FiSearch } from "react-icons/fi";
 import { serviceUrl } from "@/app/constant";
 import { useSelector } from "react-redux";
 import { decrypt } from "@/utils/crypto";
+import { Loader } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const page = () => {
   const [dlNumber, setDlNumber] = useState(""); // Input field state
@@ -14,19 +16,17 @@ const page = () => {
   const [loading, setLoading] = useState(false); // Loading state
   const authToken = useSelector((state) => state.auth.token);
   const [token, setToken] = useState(null);
-  const userDetails = useSelector((state) => state.auth.user);
-  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const parse_token = decrypt(authToken);
     setToken(parse_token);
-
-    const user_data = JSON.parse(decrypt(userDetails));
-    setUser(user_data);
   }, [token]);
   console.log(dlNumber);
 
   const dlOnwerDetails = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch(
         `${serviceUrl}sarthi/get-dl-details?dl_number=${dlNumber}`,
@@ -45,7 +45,8 @@ const page = () => {
           setDlDetails(results);
           console.log(results);
         } else {
-          setError("User not created");
+          setError(`${errorData.message}`);
+          setDlDetails(null);
         }
       } else {
         const errorData = await response.json();
@@ -53,7 +54,9 @@ const page = () => {
       }
     } catch (error) {
       console.log(error.message);
-      setError("Failed to create user, Internal server error");
+      setError(`${errorData.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,14 +77,18 @@ const page = () => {
         </div>
 
         {/* Search Button */}
-        <button
-          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm"
-          onClick={dlOnwerDetails}
-          disabled={loading || !dlNumber}
-        >
-          {loading ? "Fetching..." : "Search"}
-        </button>
+        <Button onClick={dlOnwerDetails} disabled={loading || !dlNumber}>
+          {loading ? (
+            <>
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              Fetching...
+            </>
+          ) : (
+            "Search"
+          )}
+        </Button>
       </div>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       {/* Card for DL Details */}
       {dlDetails && (

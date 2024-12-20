@@ -9,7 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Eye, Info } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,32 +37,9 @@ import { useSelector } from "react-redux";
 import { decrypt } from "@/utils/crypto";
 import { useEffect } from "react";
 import { serviceUrl } from "@/app/constant";
-import Loading from "@/app/dl-suspensions/[type]/loading";
+import Loading from "@/app/dl-suspensions/[type]/[range]/loading";
 
 export const columns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        className="text-white border-white"
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "ChallanStatusID",
     header: () => <div className="text-left text-white">Status</div>,
@@ -146,29 +123,18 @@ export const columns = [
       const DlNumber = row.getValue("DLNumber");
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href={`/user-details/${ChallanNumber}/${DlNumber}`}>
-                View Details
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+        <Link href={`/user-details/${ChallanNumber}/${DlNumber}`}>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">View Details</span>
+            <Eye size={50} color="blue" />
+          </Button>
+        </Link>
+      ); 
     },
   },
 ];
 
-function DataTableDemo({ type }) {
+function DataTableDemo({ type, range }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({});
@@ -201,7 +167,7 @@ function DataTableDemo({ type }) {
         redirect: "follow",
       };
       const response = await fetch(
-        `${serviceUrl}get-dl-suspension-recommendation-details?RTOCode=41&ChallanNumber=0&DLStatus=${type}`,
+        `${serviceUrl}get-dl-suspension-recommendation-details?RTOCode=${user?.RTOCode}&ChallanNumber=0&DLStatus=${type}&RecordRange=${range}`,
         requestOptions
       );
 
@@ -239,7 +205,7 @@ function DataTableDemo({ type }) {
     <div className="w-full">
       <h1 className="text-2xl font-bold mb-6">
         {type == 1
-          ? "DL Recommended Suspensions"
+          ? "Review Pending Suspensions"
           : type == 2
           ? "Offline Hearing"
           : type == 3
@@ -363,14 +329,6 @@ function DataTableDemo({ type }) {
         )}
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table?.getFilteredSelectedRowModel()?.rows &&
-            table?.getFilteredSelectedRowModel()?.rows?.length}{" "}
-          of{" "}
-          {table?.getFilteredRowModel()?.rows &&
-            table?.getFilteredRowModel()?.rows?.length}{" "}
-          row(s) selected.
-        </div>
         <div className="space-x-2">
           <Button
             variant="outline"

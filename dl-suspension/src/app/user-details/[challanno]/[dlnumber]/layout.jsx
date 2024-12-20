@@ -8,14 +8,14 @@ const layout = async ({ params }) => {
   const breadcrumb = [
     { href: "#", name: "RTO Authority" },
     { href: "/dashboard", name: "Dashboard" },
-    { href: "/dl-suspensions/0", name: "DL Suspensions" },
+    { href: "/dl-suspensions/1/1", name: "DL Suspensions" },
     { href: "#", name: "Challan Details" },
   ];
 
   return (
     <SidebarLayout breadcrumb={breadcrumb}>
       <Suspense fallback={<Loading />}>
-        <Page challanno={challanno} dlnumber={dlnumber}/>
+        <Page challanno={challanno} dlnumber={dlnumber} />
       </Suspense>
     </SidebarLayout>
   );
