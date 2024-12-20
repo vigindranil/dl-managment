@@ -19,7 +19,7 @@ export const getDlDetails = async (req, res) => {
           secureOptions: crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT,
         });
     
-        const response = await fetch('https://suvidha.wb.gov.in/sarathi/sarathi_others.php', {
+        const response = await fetch(process.env.SARATHI_API_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
