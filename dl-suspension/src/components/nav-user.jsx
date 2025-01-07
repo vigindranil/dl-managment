@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   BadgeCheck,
@@ -6,9 +6,9 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
-  Sparkles,
-  UserRound
-} from "lucide-react"
+  KeyRound,
+  UserRound,
+} from "lucide-react";
 
 import {
   DropdownMenu,
@@ -18,14 +18,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { decrypt } from "@/utils/crypto";
@@ -33,14 +33,13 @@ import { decrypt } from "@/utils/crypto";
 export function NavUser() {
   const userDetails = useSelector((state) => state.auth.user);
   const [user, setUser] = useState(null);
-  
-  const { isMobile } = useSidebar()
 
-  useEffect( () => {
+  const { isMobile } = useSidebar();
+
+  useEffect(() => {
     try {
       const parse_data = JSON.parse(decrypt(userDetails));
       setUser(parse_data);
-     
     } catch (error) {
       console.error("Error parsing user details:", error);
       setUser({});
@@ -48,19 +47,24 @@ export function NavUser() {
   }, []);
 
   return (
-    (<SidebarMenu>
+    <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
               <div className="bg-slate-300 rounded-full p-2">
                 <UserRound className="size-4 bg-slate-300 text-white" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user?.AuthorityName}</span>
-                <span className="truncate text-xs">{user?.AuthorityUserName}</span>
+                <span className="truncate font-semibold">
+                  {user?.AuthorityName}
+                </span>
+                <span className="truncate text-xs">
+                  {user?.AuthorityUserName}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -69,26 +73,34 @@ export function NavUser() {
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
             align="end"
-            sideOffset={4}>
+            sideOffset={4}
+          >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <div className="bg-slate-300 rounded-full p-2">
                   <UserRound className="size-4 bg-slate-300 text-white" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user?.AuthorityName}</span>
-                  <span className="truncate text-xs">{user?.AuthorityUserName}</span>
+                  <span className="truncate font-semibold">
+                    {user?.AuthorityName}
+                  </span>
+                  <span className="truncate text-xs">
+                    {user?.AuthorityUserName}
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              {/* <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem> */}
-            </DropdownMenuGroup>
-
+            {user?.AuthorityUserTypeID === 10 && (
+              <DropdownMenuGroup>
+                <Link href="/password-reset" className="bg-primary">
+                  <DropdownMenuItem>
+                    <KeyRound className="text-slate-600" />
+                    Password reset
+                  </DropdownMenuItem>
+                </Link>
+              </DropdownMenuGroup>
+            )}
             <Link href="/logout" className="bg-primary">
               <DropdownMenuItem>
                 <LogOut />
@@ -98,6 +110,6 @@ export function NavUser() {
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
-    </SidebarMenu>)
+    </SidebarMenu>
   );
 }

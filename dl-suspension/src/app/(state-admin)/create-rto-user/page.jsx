@@ -62,7 +62,7 @@ export default function CardWithInputs() {
   const router = useRouter();
 
   useEffect(() => {
-    const auth_data = decrypt(userToken);
+    const auth_data = (userToken);
     setToken(auth_data);
 
     const user_data = JSON.parse(decrypt(userDetails));
@@ -70,7 +70,6 @@ export default function CardWithInputs() {
 
     token && rtoDropDown();
   }, [token]);
-  console.log("id", token);
 
   const rtoDropDown = async () => {
     try {
@@ -113,6 +112,8 @@ export default function CardWithInputs() {
     rtoPreference || setIsInvalidRtoPreference(true);
 
     if (username && fullName && contactNo && rtoPreference) {
+      console.log(token);
+      
       try {
         const response = await fetch(`${serviceUrl}create-rto-user`, {
           method: "POST",
@@ -126,8 +127,8 @@ export default function CardWithInputs() {
             FullName: fullName,
             ContactNo: contactNo,
             RtoID: rtoPreference,
-            EntryUserID: user?.AuthorityUserID,
             OperationStatus: "0",
+            EntryUserID: user?.AuthorityUserID,
             UserID: "0",
           }),
         });
@@ -135,11 +136,8 @@ export default function CardWithInputs() {
           const decoded_data = await response.json();
 
           if (decoded_data?.status == 0) {
-            console.log("user created");
             setShowSuccessDialog(true);
           } else {
-            console.log("User not created");
-
             setError("User not created");
           }
         } else {
@@ -147,7 +145,6 @@ export default function CardWithInputs() {
           setError(`${errorData.message}`);
         }
       } catch (error) {
-        console.log(error.message);
         setError("Failed to create user, Internal server error");
       }
     }
@@ -162,7 +159,7 @@ export default function CardWithInputs() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="w-[500px]">
-        <CardHeader>
+        <CardHeader className="flex items-center">
           <CardTitle>User Information</CardTitle>
           <CardDescription>Please provide your details below.</CardDescription>
         </CardHeader>
@@ -324,7 +321,7 @@ export default function CardWithInputs() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+      {/* <AlertDialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <AlertDialogContent>
           <AlertDialogHeader className="flex flex-col items-center justify-center">
             <CheckCircle size={48} color="green" className="mb-2" />
@@ -344,7 +341,7 @@ export default function CardWithInputs() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </div>
   );
 }

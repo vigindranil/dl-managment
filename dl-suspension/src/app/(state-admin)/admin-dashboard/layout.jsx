@@ -1,27 +1,25 @@
-"use client"
+"use client";
 import React, { Suspense, useEffect, useState } from "react";
 import Page from "./page";
 import Loading from "./loading";
 import SidebarLayout from "@/components/sidebar-layout";
-import { useSelector } from "react-redux";
+import { useAuthorizationCheck } from "@/hooks/use-userAuthorization";
+import AuthorizationWrapper from "@/components/AuthorizationWrapper";
 
 const layout = () => {
-  const [ authToken, setAuthToken ] = useState("");
-  const [ user, setUser ] = useState("");
-  const token = useSelector((state) => state.auth.token);
-  const userDetails = useSelector((state) => state.auth.user);
+  useEffect(() => {}, []);
 
-  useEffect(() => {
-    setAuthToken(token);
-    setUser(userDetails);
-  }, []);
   const breadcrumb = [
     { href: "#", name: "State Authority" },
-    { href: "/admin-dashboard", name: "Dashboard" }
+    { href: "/admin-dashboard", name: "Dashboard" },
   ];
 
   return (
     <SidebarLayout breadcrumb={breadcrumb}>
+      <AuthorizationWrapper
+        authorizedUserTypes={[1]}
+        redirectPath="/admin-dashboard"
+      ></AuthorizationWrapper>
       <Suspense fallback={<Loading />}>
         <Page />
       </Suspense>

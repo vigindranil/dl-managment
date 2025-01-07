@@ -32,19 +32,19 @@ const data = {
       items: [
         {
           title: "Recommended Suspensions",
-          url: "/dl-suspensions/1",
+          url: "/dl-suspensions/1/1",
         },
         {
           title: "Processed Suspensions",
-          url: "/dl-suspensions/4",
+          url: "/dl-suspensions/4/1",
         },
         {
           title: "Online Hearings",
-          url: "/dl-suspensions/3",
+          url: "/dl-suspensions/3/1",
         },
         {
           title: "Offline Hearings",
-          url: "/dl-suspensions/2",
+          url: "/dl-suspensions/2/1",
         },
       ],
     },
@@ -61,7 +61,7 @@ const data = {
         },
         {
           title: "By Challan Number",
-          url: "#",
+          url: "/challan-search",
         },
       ],
     },
@@ -91,7 +91,6 @@ export function AppSidebar({ ...props }) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

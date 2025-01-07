@@ -7,6 +7,11 @@ import { FiSearch } from "react-icons/fi";
 import { serviceUrl } from "@/app/constant";
 import { useSelector } from "react-redux";
 import { decrypt } from "@/utils/crypto";
+import { Loader } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import { CheckCircle } from "lucide-react"; // Importing a green checkmark icon from Lucide
 
 const page = () => {
   const [dlNumber, setDlNumber] = useState(""); // Input field state
@@ -14,19 +19,17 @@ const page = () => {
   const [loading, setLoading] = useState(false); // Loading state
   const authToken = useSelector((state) => state.auth.token);
   const [token, setToken] = useState(null);
-  const userDetails = useSelector((state) => state.auth.user);
-  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const parse_token = decrypt(authToken);
+    const parse_token = authToken;
     setToken(parse_token);
-
-    const user_data = JSON.parse(decrypt(userDetails));
-    setUser(user_data);
   }, [token]);
-  console.log(dlNumber);
 
   const dlOnwerDetails = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await fetch(
         `${serviceUrl}sarthi/get-dl-details?dl_number=${dlNumber}`,
@@ -43,22 +46,47 @@ const page = () => {
 
         if (results?.status == 0) {
           setDlDetails(results);
-          console.log(results);
+          toast({
+            title: (
+              <div className="flex items-center gap-2">
+                <CheckCircle className="text-green-500" />
+                <span>Success!</span>
+              </div>
+            ),
+            description: results.message,
+          });
         } else {
-          setError("User not created");
+          setDlDetails(null);
+          toast({
+            variant: "destructive",
+            title: "Failed! ",
+            description: "Error occurred",
+            action: <ToastAction altText="Try again">Try again</ToastAction>,
+          });
         }
       } else {
         const errorData = await response.json();
-        setError(`${errorData.message}`);
+        toast({
+          variant: "destructive",
+          title: "Failed! ",
+          description: "Error occurred",
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
       }
     } catch (error) {
-      console.log(error.message);
-      setError("Failed to create user, Internal server error");
+      toast({
+        variant: "destructive",
+        title: "Failed! ",
+        description: "Error occurred",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-10 bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-5 bg-gray-50">
       {/* Wrapper for Input and Search Button */}
       <div className="flex gap-4 w-full md:w-1/2 bg-white py-6 px-6 rounded-lg shadow-md">
         {/* Input Field */}
@@ -74,18 +102,22 @@ const page = () => {
         </div>
 
         {/* Search Button */}
-        <button
-          className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md text-sm"
-          onClick={dlOnwerDetails}
-          disabled={loading || !dlNumber}
-        >
-          {loading ? "Fetching..." : "Search"}
-        </button>
+        <Button onClick={dlOnwerDetails} disabled={loading || !dlNumber}>
+          {loading ? (
+            <>
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              Fetching...
+            </>
+          ) : (
+            "Search"
+          )}
+        </Button>
       </div>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       {/* Card for DL Details */}
       {dlDetails && (
-        <div className="w-full px-4 mt-8">
+        <div className="w-full px-4 mt-8 mb-8">
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -179,7 +211,7 @@ const page = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Vehicle Class</p>
                   <p className="font-medium">
-                    {dlDetails?.data?.vehicleClass.join(", ") ?? "N/A"}
+                    {dlDetails?.data?.vehicleClass?.join(", ") ?? "N/A"}
                   </p>
                 </div>
                 <div>
@@ -231,7 +263,7 @@ const page = () => {
               </div>
 
               {/* Right Section: Photo and Signature */}
-              <div className="flex flex-col items-center gap-10">
+              <div className="flex flex-col items-center gap-2">
                 <p className="text-sm text-muted-foreground">DL Owner Photo</p>
                 {/* DL Owner Photo */}
                 <div className="w-[300px] h-[300px] flex items-center justify-center rounded-lg">

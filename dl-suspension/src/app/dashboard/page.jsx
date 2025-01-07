@@ -1,51 +1,50 @@
 "use client";
-import React from "react";
-import { useState, useEffect } from "react";
+
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import Link from "next/link";
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertCircle,
   CheckCircle2,
   Wifi,
   WifiOff,
-  CircleArrowRight,
+  ArrowRight,
+  AlertTriangle,
 } from "lucide-react";
-import Link from "next/link";
 import { serviceUrl } from "@/app/constant";
-import { useSelector } from "react-redux";
 import { decrypt } from "@/utils/crypto";
 
-const page = () => {
+const DashboardPage = () => {
   const authToken = useSelector((state) => state.auth.token);
-  const [token, setToken] = useState(null);
   const userDetails = useSelector((state) => state.auth.user);
-  const [user, setUser] = useState(null);
-  const [dashboardCount, setDashboardCount] = useState([]);
+  const [dashboardCount, setDashboardCount] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState("");
+  // const encryptedToken = sessionStorage.getItem("token");
 
   useEffect(() => {
-    const parse_token = decrypt(authToken);
+    const parse_token = authToken;
     setToken(parse_token);
+    const userData = JSON.parse(decrypt(userDetails));
+    token && dashboardCountRto(userData?.RTOCode);
+  }, [userDetails, token]);
 
-    const user_data = JSON.parse(decrypt(userDetails));
-    setUser(user_data);
-
-    token && dashboardCountRto();
-  }, [token]);
-  console.log(dashboardCount?.data?.NoOfPendingChallan);
-
-  const dashboardCountRto = async () => {
-    console.log("hi",token);
-
+  const dashboardCountRto = async (rtoCode) => {
     try {
       const response = await fetch(
-        `${serviceUrl}get-rto-dashboard-count?rto_code=41`,
+        `${serviceUrl}get-rto-dashboard-count?rto_code=${rtoCode}`,
         {
           method: "GET",
           headers: {
@@ -55,110 +54,142 @@ const page = () => {
         }
       );
       if (response.ok) {
-        const decoded_data = await response.json();
-
-        if (decoded_data?.status == 0) {
-          setDashboardCount(decoded_data);
-          console.log(decoded_data);
+        const decodedData = await response.json();
+        if (decodedData?.status === 0) {
+          setDashboardCount(decodedData.data);
         } else {
-          setError("User not created");
+          setError("Failed to fetch dashboard data");
         }
       } else {
         const errorData = await response.json();
-        setError(`${errorData.message}`);
+        setError(errorData.message || "Failed to fetch dashboard data");
       }
     } catch (error) {
-      console.log(error.message);
-      setError("Failed to create user, Internal server error");
+      console.error(error);
+      setError("Internal server error");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const DashboardCard = ({
+    title,
+    count,
+    icon: Icon,
+    color,
+    link,
+    description,
+    total,
+    totalCount,
+  }) => (
+    <Card
+      className={`border-l-4 border-l-${color}-400 hover:shadow-lg transition-shadow`}
+    >
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-lg font-bold text-slate-700">
+          {title} <span className="block text-sm text-slate-400">(Today)</span>
+        </CardTitle>
+        <Icon className={`w-8 h-8 text-${color}-500`} />
+      </CardHeader>
+      <CardContent>
+        <div className="text-5xl font-bold mb-2">{count}</div>
+
+        <Button
+          variant="secondary"
+          asChild
+          className="w-full justify-between hover:bg-slate-100"
+        >
+          <Link href={`${link}/1`}>
+            View details
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Link>
+        </Button>
+        <Button
+          variant="link"
+          asChild
+          className="w-full justify-between text-xs"
+        >
+          <Link href={`${link}/0`}>{`${total} : ${totalCount}`}</Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
-        <Card className="border-l-yellow-400 border-l-4">
-          <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-            <CardTitle className="text-lg font-bold text-slate-500">
-              Recommended Suspensions 
-            </CardTitle>
-            <AlertCircle className="w-8 h-8 ml-auto text-yellow-500" />
-          </CardHeader>
-          <CardContent>
-            <h1 className="text-5xl font-medium">{dashboardCount?.data?.NoOfPendingChallan}</h1>
-          </CardContent>
-          <CardFooter>
-            <Button variant="link" asChild className=" bg-stone-100">
-              <Link href={"/dl-suspensions/1"}>
-                show more
-                <CircleArrowRight className="w-4 h-4 ml-auto text-muted-foreground" />
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card className="border-l-emerald-400 border-l-4">
-          <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-            <CardTitle className="text-lg font-bold text-slate-500">
-              Processed Suspensions
-            </CardTitle>
-            <CheckCircle2 className="w-8 h-8 ml-auto text-emerald-500" />
-          </CardHeader>
-          <CardContent>
-            <h1 className="text-5xl">{dashboardCount?.data?.NoChallanProcessed}</h1>
-          </CardContent>
-          <CardFooter>
-            <Button variant="link" asChild className=" bg-stone-100">
-              <Link href={"/dl-suspensions/4"}>
-                show more
-                <CircleArrowRight className="w-4 h-4 ml-auto text-muted-foreground" />
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4">
-        <Card className="border-l-sky-400 border-l-4">
-          <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-            <CardTitle className="text-lg font-bold text-slate-500">
-              Online Hearings
-            </CardTitle>
-            <Wifi className="w-8 h-8 ml-auto text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <h1 className="text-5xl">{dashboardCount?.data?.NoOfOnlineHearing}</h1>
-          </CardContent>
-          <CardFooter>
-            <Button variant="link" asChild className=" bg-stone-100">
-              <Link href={"/dl-suspensions/3"}>
-                show more
-                <CircleArrowRight className="w-4 h-4 ml-auto text-muted-foreground" />
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card className="border-l-rose-400 border-l-4">
-          <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-            <CardTitle className="text-lg font-bold text-slate-500">
-              Offline Hearings
-            </CardTitle>
-            <WifiOff className="w-8 h-8 ml-auto text-red-400" />
-          </CardHeader>
-          <CardContent>
-            <h1 className="text-5xl">{dashboardCount?.data?.NoOfOfflineHearing}</h1>
-          </CardContent>
-          <CardFooter>
-            <Button variant="link" asChild className=" bg-stone-100">
-              <Link href={"/dl-suspensions/2"}>
-                show more {}
-                <CircleArrowRight className="w-4 h-4 ml-auto text-muted-foreground" />
-              </Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-slate-800 mb-6">RTO Dashboard</h1>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="border-l-4 border-l-gray-200">
+              <CardHeader>
+                <Skeleton className="h-4 w-[200px]" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-10 w-[100px]" />
+              </CardContent>
+              <CardFooter>
+                <Skeleton className="h-10 w-full" />
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <DashboardCard
+            title="Review Pending Suspensions"
+            count={dashboardCount?.NoOfPendingChallanOneWeek || 0}
+            icon={AlertTriangle}
+            color="yellow"
+            link="/dl-suspensions/1"
+            description="Pending cases requiring attention"
+            total="Total pending cases"
+            totalCount={dashboardCount?.NoOfPendingChallan || 0}
+          />
+          <DashboardCard
+            title="Disposed Suspensions"
+            count={dashboardCount?.NoChallanProcessedOneWeek || 0}
+            icon={CheckCircle2}
+            color="emerald"
+            link="/dl-suspensions/4"
+            description="Successfully processed cases"
+            total="Total processed cases"
+            totalCount={dashboardCount?.NoChallanProcessed || 0}
+          />
+          <DashboardCard
+            title="Scheduled Online Hearings"
+            count={dashboardCount?.NoOfOnlineHearingOneWeek || 0}
+            icon={Wifi}
+            color="sky"
+            link="/dl-suspensions/3"
+            description="Scheduled virtual hearings"
+            total="Total online cases"
+            totalCount={dashboardCount?.NoOfOnlineHearing || 0}
+          />
+          <DashboardCard
+            title="In-person Offline Hearings"
+            count={dashboardCount?.NoOfOfflineHearingOneWeek || 0}
+            icon={WifiOff}
+            color="rose"
+            link="/dl-suspensions/2"
+            total="Total offline cases"
+            totalCount={dashboardCount?.NoOfOfflineHearing || 0}
+            description="In-person hearing appointments"
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-export default page;
+export default DashboardPage;

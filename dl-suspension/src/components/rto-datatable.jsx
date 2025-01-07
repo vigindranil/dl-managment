@@ -196,7 +196,7 @@ function RTODataTable() {
   ];
 
   useEffect(() => {
-    const parse_token = decrypt(authToken);
+    const parse_token = authToken;
     setToken(parse_token);
     token && getRTOUsers();
 
@@ -205,9 +205,9 @@ function RTODataTable() {
 
     token && rtoDropDown();
   }, [token]);
+  console.log(token);
 
   const handleDelete = async () => {
-    console.log("id", user?.AuthorityUserID);
     try {
       const response = await fetch(`${serviceUrl}create-rto-user`, {
         method: "POST",
@@ -230,21 +230,15 @@ function RTODataTable() {
         const decoded_data = await response.json();
 
         if (decoded_data?.status == 0) {
-          console.log("user deleted");
           setShowSuccessDialog(true);
         } else {
-          console.log("User not deleted");
-
           setError("User not deleted");
         }
       } else {
         const errorData = await response.json();
-        console.log(errorData.message);
         setError(`${errorData.message}`);
       }
     } catch (error) {
-      console.log("catch");
-      console.log(error.message);
       setError("Failed to create user, Internal server error");
     }
   };
@@ -272,11 +266,8 @@ function RTODataTable() {
         const decoded_data = await response.json();
 
         if (decoded_data?.status == 0) {
-          console.log("user Edited");
           setShowEditSuccess(true);
         } else {
-          console.log("User not Edited");
-
           setError("User not Edited");
         }
       } else {
@@ -284,13 +275,11 @@ function RTODataTable() {
         setError(`${errorData.message}`);
       }
     } catch (error) {
-      console.log(error.message);
       setError("Failed to Edited user, Internal server error");
     }
   };
   const rtoDropDown = async () => {
     try {
-      console.log("token", token);
       if (!token) {
         console.error("Token is not available");
         return;
@@ -299,13 +288,12 @@ function RTODataTable() {
       const response = await fetch(`${serviceUrl}get-all-rto-list`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json", 
+          "Content-Type": "application/json",
           authorization: `Bearer ${token}`,
         },
       });
       if (response.ok) {
         const result = await response.json();
-
         setRtoOptions(result.data);
       } else {
         console.error("Failed to fetch RTO options");
@@ -327,7 +315,6 @@ function RTODataTable() {
   async function getRTOUsers() {
     try {
       const myHeaders = new Headers();
-      console.log("token: ", token);
       myHeaders.append("Authorization", `Bearer ${token}`);
       const requestOptions = {
         method: "GET",
@@ -337,7 +324,6 @@ function RTODataTable() {
       await fetch(`${serviceUrl}get-rto-user-details?UserID=0`, requestOptions)
         .then((response) => response.json())
         .then((result) => {
-          console.log(result.data);
           setApiData(result.data);
         })
         .catch((error) => console.error(error));
@@ -598,9 +584,10 @@ function RTODataTable() {
                 Contact No
               </label>
               <input
-                type="number"
                 id="contactNo"
                 name="contactNo"
+                type="tel"
+                maxLength="10"
                 value={currentUser?.ContactNo}
                 onChange={(e) =>
                   setCurrentUser({ ...currentUser, ContactNo: e.target.value })
