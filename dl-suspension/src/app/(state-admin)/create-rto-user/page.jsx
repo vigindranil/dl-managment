@@ -62,7 +62,7 @@ export default function CardWithInputs() {
   const router = useRouter();
 
   useEffect(() => {
-    const auth_data = (userToken);
+    const auth_data = userToken;
     setToken(auth_data);
 
     const user_data = JSON.parse(decrypt(userDetails));
@@ -112,8 +112,6 @@ export default function CardWithInputs() {
     rtoPreference || setIsInvalidRtoPreference(true);
 
     if (username && fullName && contactNo && rtoPreference) {
-      console.log(token);
-      
       try {
         const response = await fetch(`${serviceUrl}create-rto-user`, {
           method: "POST",

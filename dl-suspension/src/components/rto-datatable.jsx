@@ -205,7 +205,6 @@ function RTODataTable() {
 
     token && rtoDropDown();
   }, [token]);
-  console.log(token);
 
   const handleDelete = async () => {
     try {
@@ -244,6 +243,7 @@ function RTODataTable() {
   };
 
   const handleSave = async () => {
+    console.log(currentUser?.RTOCode);
     try {
       const response = await fetch(`${serviceUrl}create-rto-user`, {
         method: "POST",
@@ -547,6 +547,7 @@ function RTODataTable() {
                   onValueChange={(value) =>
                     setCurrentUser({ ...currentUser, RTOCode: value })
                   }
+                  disabled
                 >
                   <SelectTrigger id="rto">
                     <SelectValue placeholder="Select RTO preference" />

@@ -80,7 +80,6 @@ const Page = ({ challanno, dlnumber }) => {
     setUser(user_data);
     token && dlSuspensionRecommendedViewUser();
   }, [token]);
-  // console.log(hearingDate.toISOString());
 
   const handleHearingDateChange = (date) => {
     setHearingDate(date);
@@ -274,6 +273,7 @@ const Page = ({ challanno, dlnumber }) => {
     try {
       const response = await fetch(
         `${serviceUrl}sarthi/get-dl-details?dl_number=${dlnumber}`,
+        // `${serviceUrl}sarthi/get-dl-details?dl_number=WB0120210009361`,
         {
           method: "GET",
           headers: {
@@ -465,7 +465,6 @@ const Page = ({ challanno, dlnumber }) => {
                       </p>
                     </div>
                   </div>
-
                   {/* Right Section: Photo and Signature */}
                   <div className="flex flex-col items-center gap-10">
                     <p className="text-sm text-muted-foreground">
@@ -487,7 +486,6 @@ const Page = ({ challanno, dlnumber }) => {
                         </div>
                       )}
                     </div>
-
                     {/* Signature */}
                     <p className="text-sm text-muted-foreground">
                       DL Owner Signature
@@ -512,7 +510,6 @@ const Page = ({ challanno, dlnumber }) => {
               </Card>
             </AccordionContent>
           </AccordionItem>
-
           <AccordionItem
             value="challan-details"
             className="border-b border-gray-800 bg-slate-50"
@@ -556,7 +553,6 @@ const Page = ({ challanno, dlnumber }) => {
                                   year: "numeric",
                                 }
                               );
-
                               const formattedTime = date
                                 .toLocaleTimeString("en-GB", {
                                   hour: "2-digit",
@@ -666,7 +662,6 @@ const Page = ({ challanno, dlnumber }) => {
               </Card>
             </AccordionContent>
           </AccordionItem>
-
           <AccordionItem
             value="challan-impound-documents"
             className="border-b border-gray-800 bg-slate-50"
@@ -708,7 +703,6 @@ const Page = ({ challanno, dlnumber }) => {
                         )}
                       </div>
                     </div>
-
                     {/* Vehicle Image */}
                     <div>
                       <p className="text-sm text-muted-foreground">
@@ -735,7 +729,6 @@ const Page = ({ challanno, dlnumber }) => {
                         )}
                       </div>
                     </div>
-
                     {/* Vehicle Impound Image */}
                     <div>
                       <p className="text-sm text-muted-foreground">
@@ -759,7 +752,6 @@ const Page = ({ challanno, dlnumber }) => {
                           </div>
                         )}
                       </div>
-
                       {/* Modal for Displaying Selected Image */}
                       {selectedImage && (
                         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
@@ -790,7 +782,6 @@ const Page = ({ challanno, dlnumber }) => {
       ) : (
         <Loading />
       )}
-
       {/* Recommendation Card */}
       {apiData?.ChallanStatusID === 1 ? (
         <Card className="mt-6">
@@ -935,7 +926,6 @@ const Page = ({ challanno, dlnumber }) => {
                   readOnly
                 />
               </div>
-
               <div className="mb-4">
                 <label
                   htmlFor="hearing-date"
@@ -956,7 +946,6 @@ const Page = ({ challanno, dlnumber }) => {
                   readOnly
                 />
               </div>
-
               {apiData?.ChallanStatusID === 3 && (
                 <div>
                   <label
