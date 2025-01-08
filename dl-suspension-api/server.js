@@ -6,6 +6,7 @@ import schedulerRoutes from './routes/scheduler.js';
 import challanRoutes from './routes/challan.js';
 import verifyToken from './middlewares/authMiddleware.js';
 import rtoAdmin from './routes/rtoAdmin.js';
+import sarthiRoutes from './routes/sarthi.js';
 import cors from 'cors';
 import morgan from 'morgan';
 const app = express();
@@ -19,6 +20,7 @@ app.use(morgan('dev'));
 app.use('/api/auth', authRoutes);
 app.use('/api/scheduler', schedulerRoutes);
 app.use('/api/challan', challanRoutes);
+app.use('/api/sarthi', sarthiRoutes);
 
 // Protected Route
 app.use('/api/',verifyToken, rtoAdmin);
