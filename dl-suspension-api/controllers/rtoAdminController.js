@@ -1,5 +1,5 @@
 import { getErrorCode, getErrorCodeAndUserID } from "../models/commonModel.js";
-import { getAllRTODetails, getDLSuspensionRecommendationDetails, getRTODashboardCount, getRTOUserDetails, saveCreateRtoUser, updateUserPasswordModel } from "../models/rtoAdminModel.js";
+import { getAllRTODetails, getDLSuspensionRecommendationDetails, getRTODashboardCount, getRTOUserDetails, saveCreateRtoUser, updateUserPasswordModel, getDLSuspensionMISReportDetailsModel } from "../models/rtoAdminModel.js";
 import validateFields from "../utils/validators.js";
 
 export const createRtoUser = async (req, res) => {
@@ -310,6 +310,70 @@ export const getRtoDashboardCount = async (req, res) => {
         data: null,
       });
     }
+  } catch (error) {
+    return res.status(500).json({
+      status: 1,
+      message: "Internal server error",
+      data: null,
+    });
+  }
+};
+
+export const getDLSuspensionMISReportDetails = async (req, res) => {
+  try {
+    const { RTOCode, FromDate, ToDate, DLStatus } = req.query;
+
+    // Validate required fields using the validateFields function
+    try {
+      validateFields(req.query, ["RTOCode", "FromDate", "ToDate", "DLStatus"]);
+    } catch (error) {
+      return res.status(400).json({
+        status: 1,
+        message: error.message,
+        data: null,
+      });
+    }
+
+    // Fetch data from the database
+    const dbResults = await getDLSuspensionMISReportDetailsModel(RTOCode, FromDate, ToDate, DLStatus);
+
+    // Check if dbResults is valid
+    if (!dbResults || dbResults.length === 0 || !dbResults[0]) {
+      return res.status(404).json({
+        status: 1,
+        message: "No data found",
+        data: null,
+      });
+    }
+
+    const rawData = dbResults[0]; // Assuming the result is an array
+    const groupedData = rawData[0].reduce((acc, record) => {
+      const { DLNumber, OffenceName, OffenceAct, ...otherDetails } = record;
+
+      if (!acc[DLNumber]) {
+        // Initialize a new group for this DLNumber
+        acc[DLNumber] = {
+          ...otherDetails, // Copy all other details (assumed common per DLNumber)
+          DLNumber,
+          OffenceDetails: [], // Create an array to store offences
+        };
+      }
+
+      // Add the offence details to the group
+      acc[DLNumber].OffenceDetails.push({ OffenceName, OffenceAct });
+
+      return acc;
+    }, {});
+
+    // Convert the grouped object into an array
+    const groupedArray = Object.values(groupedData);
+
+    // Send the response
+    return res.json({
+      status: 0,
+      message: "Details fetched successfully.",
+      data: groupedArray, // Return the transformed data
+    });
   } catch (error) {
     return res.status(500).json({
       status: 1,

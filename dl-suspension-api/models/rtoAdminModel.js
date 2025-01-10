@@ -63,3 +63,15 @@ export async function updateUserPasswordModel(
     ]
   );
 }
+
+export async function getDLSuspensionMISReportDetailsModel(
+  RTOCode,
+  FromDate,
+  ToDate,
+  DLStatus
+) {
+  return await pool.query(
+    "CALL sp_getDLSuspensionMISReportDetails(?,?,?,?);",
+    [RTOCode, FromDate, ToDate, DLStatus]
+  );
+}
