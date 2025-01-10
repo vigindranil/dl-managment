@@ -65,12 +65,10 @@ function DataTableDemo({ type, range }) {
         headers: myHeaders,
         redirect: "follow",
       };
-
       const response = await fetch(
         `${serviceUrl}get-dl-suspension-recommendation-details?RTOCode=${user?.RTOCode}&ChallanNumber=0&DLStatus=${type}&RecordRange=${range}`,
         requestOptions
       );
-
       const result = await response.json();
       result?.data && result?.data?.length == 0
         ? setApiData("")

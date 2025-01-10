@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Car, Search, BadgeCheck } from "lucide-react";
+import { Car, Search, BadgeCheck, FileText } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
@@ -66,6 +65,19 @@ const data = {
       ],
     },
     {
+      title: "Report",
+      url: "#",
+      icon: FileText,
+      isActive: true,
+      type: 10,
+      items: [
+        {
+          title: "MIS Reports",
+          url: "/mis-reports",
+        },
+      ],
+    },
+    {
       title: "Admin Operations",
       url: "#",
       icon: Search,
@@ -90,8 +102,7 @@ export function AppSidebar({ ...props }) {
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
-      <SidebarFooter>
-      </SidebarFooter>
+      <SidebarFooter></SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

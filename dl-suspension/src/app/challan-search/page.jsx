@@ -26,7 +26,7 @@ const page = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const parse_token = (authToken);
+    const parse_token = authToken;
     setToken(parse_token);
 
     const user_data = JSON.parse(decrypt(userDetails));
@@ -220,6 +220,63 @@ const page = () => {
                     ) : (
                       <CircleCheck className="w-4 h-4 text-emerald-500 inline ml-2" />
                     )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Hearing Status
+                  </p>
+                  <p
+                    className={`font-medium ${
+                      apiData?.ChallanStatusID === 1
+                        ? "bg-yellow-200"
+                        : apiData?.ChallanStatusID === 4
+                        ? "bg-emerald-200"
+                        : apiData?.ChallanStatusID === 3
+                        ? "bg-sky-200"
+                        : apiData?.ChallanStatusID === 2
+                        ? "bg-red-200"
+                        : "bg-slate-200"
+                    } text-slate-500 hover:text-white rounded-full px-2 py-1 inline-block`}
+                  >
+                    {apiData?.ChallanStatusID === 1
+                      ? "Pending"
+                      : apiData?.ChallanStatusID === 4
+                      ? "Disposed"
+                      : apiData?.ChallanStatusID === 3
+                      ? "Online"
+                      : apiData?.ChallanStatusID === 2
+                      ? "Offline"
+                      : "Unknown"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Hearing Date</p>
+                  <p className="font-medium">
+                    {apiData?.HearingDate
+                      ? (() => {
+                          const date = new Date(apiData.HearingDate);
+                          const formattedDate = date.toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            }
+                          );
+
+                          const formattedTime = date
+                            .toLocaleTimeString("en-GB", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              second: "2-digit",
+                              hour12: true,
+                            })
+                            .toUpperCase();
+
+                          return `${formattedDate} ${formattedTime}`;
+                        })()
+                      : "N/A"}
                   </p>
                 </div>
                 <div>

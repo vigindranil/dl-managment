@@ -75,6 +75,7 @@ const DashboardPage = () => {
   const DashboardCard = ({
     title,
     count,
+    day,
     icon: Icon,
     color,
     link,
@@ -87,30 +88,32 @@ const DashboardPage = () => {
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg font-bold text-slate-700">
-          {title} <span className="block text-sm text-slate-400">(Today)</span>
+          {title} <span className="block text-sm text-slate-400">{day}</span>
         </CardTitle>
         <Icon className={`w-8 h-8 text-${color}-500`} />
       </CardHeader>
       <CardContent>
         <div className="text-5xl font-bold mb-2">{count}</div>
 
-        <Button
-          variant="secondary"
-          asChild
-          className="w-full justify-between hover:bg-slate-100"
-        >
-          <Link href={`${link}/1`}>
-            View details
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Link>
-        </Button>
-        <Button
-          variant="link"
-          asChild
-          className="w-full justify-between text-xs"
-        >
-          <Link href={`${link}/0`}>{`${total} : ${totalCount}`}</Link>
-        </Button>
+        <div className="flex justify-between">
+          <Button
+            variant="secondary"
+            asChild
+            className="w-auto justify-between hover:bg-slate-100"
+          >
+            <Link href={`${link}/1`}>
+              View details
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+          </Button>
+          <Button
+            variant="link"
+            asChild
+            className="w-auto  justify-between text-xs"
+          >
+            <Link href={`${link}/0`}>{`${total} : ${totalCount}`}</Link>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
@@ -145,44 +148,48 @@ const DashboardPage = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
           <DashboardCard
             title="Review Pending Suspensions"
             count={dashboardCount?.NoOfPendingChallanOneWeek || 0}
+            day="(Last 7 Days)"
             icon={AlertTriangle}
             color="yellow"
             link="/dl-suspensions/1"
             description="Pending cases requiring attention"
-            total="Total pending cases"
+            total="Total (Archived)"
             totalCount={dashboardCount?.NoOfPendingChallan || 0}
           />
           <DashboardCard
             title="Disposed Suspensions"
             count={dashboardCount?.NoChallanProcessedOneWeek || 0}
             icon={CheckCircle2}
+            day="(Last 7 Days)"
             color="emerald"
             link="/dl-suspensions/4"
             description="Successfully processed cases"
-            total="Total processed cases"
+            total="Total (Archived)"
             totalCount={dashboardCount?.NoChallanProcessed || 0}
           />
           <DashboardCard
             title="Scheduled Online Hearings"
             count={dashboardCount?.NoOfOnlineHearingOneWeek || 0}
+            day="(Today)"
             icon={Wifi}
             color="sky"
             link="/dl-suspensions/3"
             description="Scheduled virtual hearings"
-            total="Total online cases"
+            total="Total (Archived)"
             totalCount={dashboardCount?.NoOfOnlineHearing || 0}
           />
           <DashboardCard
-            title="In-person Offline Hearings"
+            title="Offline Hearings"
             count={dashboardCount?.NoOfOfflineHearingOneWeek || 0}
+            day="(Today)"
             icon={WifiOff}
             color="rose"
             link="/dl-suspensions/2"
-            total="Total offline cases"
+            total="Total (Archived)"
             totalCount={dashboardCount?.NoOfOfflineHearing || 0}
             description="In-person hearing appointments"
           />

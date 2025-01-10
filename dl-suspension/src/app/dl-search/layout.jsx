@@ -7,6 +7,7 @@ import AuthorizationWrapper from "@/components/AuthorizationWrapper";
 const layout = () => {
   const breadcrumb = [
     { href: "#", name: "RTO Authority" },
+    { href: "/dashboard", name: "Dashboard" },
     { href: "#", name: "DL Search" },
   ];
   return (

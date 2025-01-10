@@ -58,7 +58,7 @@ const Page = ({ challanno, dlnumber }) => {
   const [remarks, setRemarks] = useState("");
   const [pendingType, setPendingType] = useState("");
   const [onlineMeetingLink, setOnlineMeetingLink] = useState("");
-  const [hearingDate, setHearingDate] = useState(null);
+  const [hearingDate, setHearingDate] = useState("");
   const [isInvalidRemarks, setIsInvalidRemarks] = useState(false);
   const [isInvalidPendingType, setIsInvalidPendingType] = useState(false);
   const [isInvalidOnlineMeetingLink, setIsInvalidOnlineMeetingLink] =
@@ -954,13 +954,25 @@ const Page = ({ challanno, dlnumber }) => {
                   >
                     Online Meeting Link
                   </label>
-                  <Textarea
-                    id="online-meeting-link"
-                    placeholder="Enter the online meeting link"
-                    value={apiData?.OnlineMeetingLink}
-                    readOnly // Ensures the user can't edit if it's just for viewing
-                    className="mt-1 w-full rounded-md border-gray-300 shadow-sm"
-                  />
+                  {apiData?.OnlineMeetingLink ? (
+                    <div className="mt-1 flex items-center gap-4">
+                      <a
+                        href={apiData.OnlineMeetingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 underline"
+                      >
+                        Join the Meeting
+                      </a>
+                      <span className="text-gray-700 break-all">
+                        {apiData.OnlineMeetingLink}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-sm text-gray-500">
+                      No meeting link available.
+                    </p>
+                  )}
                 </div>
               )}
             </div>

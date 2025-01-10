@@ -8,15 +8,14 @@ const layout = () => {
   const breadcrumb = [
     { href: "#", name: "RTO Authority" },
     { href: "/dashboard", name: "Dashboard" },
-    { href: "#", name: "Challan Search" },
+    { href: "#", name: "MIS Reports" },
   ];
   return (
     <SidebarLayout breadcrumb={breadcrumb}>
       <AuthorizationWrapper
         authorizedUserTypes={[10]}
-        redirectPath="/challan-search"
+        redirectPath="/mis-reports"
       ></AuthorizationWrapper>
-
       <Suspense fallback={<Loading />}>
         <Page />
       </Suspense>
