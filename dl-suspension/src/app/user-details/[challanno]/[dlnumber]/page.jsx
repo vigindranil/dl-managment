@@ -272,8 +272,8 @@ const Page = ({ challanno, dlnumber }) => {
   const dlOnwerDetails = async () => {
     try {
       const response = await fetch(
-        `${serviceUrl}sarthi/get-dl-details?dl_number=${dlnumber}`,
-        // `${serviceUrl}sarthi/get-dl-details?dl_number=WB0120210009361`,
+        // `${serviceUrl}sarthi/get-dl-details?dl_number=${dlnumber}`,
+        `${serviceUrl}sarthi/get-dl-details?dl_number=WB1120220002304`,
         {
           method: "GET",
           headers: {
@@ -299,10 +299,88 @@ const Page = ({ challanno, dlnumber }) => {
     }
   };
 
+  const dlSuspensionRecommendationAction = async () => {
+    console.log(remarks);
+    console.log(pendingType);
+    setIsInvalidRemarks(false);
+    setIsInvalidPendingType(false);
+
+    remarks || setIsInvalidRemarks(true);
+    pendingType || setIsInvalidPendingType(true);
+    if (remarks && pendingType) {
+      try {
+        const response = await fetch(
+          `${serviceUrl}challan/update-dl-suspension-recommendation-details`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              DLSuspensionID: apiData?.DLSuspensionID,
+              ChallanStatus: 4,
+              OnlineMeetingLink: onlineMeetingLink || "",
+              EntryUserID: user?.AuthorityUserID,
+              Remarks: remarks,
+              HearingDate: hearingDate ? formatDate(hearingDate) : null,
+            }),
+          }
+        );
+        if (response.ok) {
+          const decoded_data = await response.json();
+
+          if (decoded_data?.status == 0) {
+            toast({
+              title: (
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="text-green-500" />
+                  <span>Success!</span>
+                </div>
+              ),
+              description: decoded_data.message,
+            });
+            router.push(`/dl-suspensions/1/1`);
+          } else {
+            setError("User not created");
+            toast({
+              variant: "destructive",
+              title: "Failed! ",
+              description: error,
+              action: <ToastAction altText="Try again">Try again</ToastAction>,
+            });
+          }
+        } else {
+          const errorData = await response.json();
+          setError(`${errorData.message}`);
+          toast({
+            variant: "destructive",
+            title: "Failed! ",
+            description: error,
+            action: <ToastAction altText="Try again">Try again</ToastAction>,
+          });
+        }
+      } catch (error) {
+        setError("Failed to create user, Internal server error");
+        toast({
+          variant: "destructive",
+          title: "Failed! ",
+          description: error,
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
+      }
+    } else {
+      toast({
+        variant: "destructive",
+        title: "OPPS! ",
+        description: "Please fill in all required fields correctly",
+      });
+    }
+  };
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Challan Details</h1>
-      {apiData || dlOnwer || base64ImageDoc ? (
+      {(apiData && dlOnwer) || base64ImageDoc ? (
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem
             value="dl-details"
@@ -794,25 +872,6 @@ const Page = ({ challanno, dlnumber }) => {
           <CardContent>
             <div className="space-y-2">
               <div>
-                <label htmlFor="remarks" className="text-sm font-medium">
-                  Remarks
-                </label>
-                <Textarea
-                  id="remarks"
-                  placeholder="Enter your remarks here"
-                  value={remarks}
-                  onChange={(e) => setRemarks(e.target.value)}
-                  className={`rounded-e-none rounded-s-md ring-inset ${
-                    isInvalidRemarks &&
-                    !remarks &&
-                    "ring-1 ring-red-500 focus-visible:ring-red-500"
-                  }`}
-                />
-              </div>
-              {isInvalidRemarks && !remarks && (
-                <p className="text-red-500 text-sm">Remarks is required!</p>
-              )}
-              <div>
                 <label htmlFor="hearing-type" className="text-sm font-medium">
                   Recommended Hearing Type
                 </label>
@@ -832,9 +891,9 @@ const Page = ({ challanno, dlnumber }) => {
                     <SelectValue placeholder="Select hearing type" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="4">Disposed</SelectItem>
                     <SelectItem value="3">Online Hearing</SelectItem>
                     <SelectItem value="2">Offline Hearing</SelectItem>
-                    <SelectItem value="4">Disposed hearing</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -842,6 +901,25 @@ const Page = ({ challanno, dlnumber }) => {
                 <p className="text-red-500 text-sm">
                   Recommendation is required!
                 </p>
+              )}
+              <div>
+                <label htmlFor="remarks" className="text-sm font-medium">
+                  Remarks
+                </label>
+                <Textarea
+                  id="remarks"
+                  placeholder="Enter your remarks here"
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  className={`rounded-e-none rounded-s-md ring-inset ${
+                    isInvalidRemarks &&
+                    !remarks &&
+                    "ring-1 ring-red-500 focus-visible:ring-red-500"
+                  }`}
+                />
+              </div>
+              {isInvalidRemarks && !remarks && (
+                <p className="text-red-500 text-sm">Remarks is required!</p>
               )}
               {(pendingType === "2" || pendingType === "3") && (
                 <div className="mb-4">
@@ -910,30 +988,38 @@ const Page = ({ challanno, dlnumber }) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <IterationCcw className="h-5 w-5" />
-              Recommendation
+              Hearing Deatils
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div>
                 <label htmlFor="remarks" className="text-sm font-medium">
-                  Remarks
+                  Remarks: {apiData?.Remarks}
                 </label>
-                <Textarea
+                {/* <Textarea
                   id="remarks"
                   placeholder="Enter your remarks here"
                   value={apiData?.Remarks}
                   readOnly
-                />
+                /> */}
               </div>
               <div className="mb-4">
                 <label
                   htmlFor="hearing-date"
                   className="text-sm font-medium block mb-1"
                 >
-                  Hearing Date
+                  Hearing Date:{" "}
+                  {
+                    apiData?.HearingDate
+                      ? format(
+                          new Date(apiData.HearingDate),
+                          "dd MMM yyyy, hh:mm a"
+                        )
+                      : "" // Fallback in case HearingDate is null or invalid
+                  }
                 </label>
-                <Textarea
+                {/* <Textarea
                   id="hearing-date"
                   value={
                     apiData?.HearingDate
@@ -944,7 +1030,7 @@ const Page = ({ challanno, dlnumber }) => {
                       : "" // Fallback in case HearingDate is null or invalid
                   }
                   readOnly
-                />
+                /> */}
               </div>
               {apiData?.ChallanStatusID === 3 && (
                 <div>
@@ -975,6 +1061,76 @@ const Page = ({ challanno, dlnumber }) => {
                   )}
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      {(apiData?.ChallanStatusID == 2 || apiData?.ChallanStatusID == 3) && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IterationCcw className="h-5 w-5" />
+              Recommendation
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {isInvalidRemarks && !remarks && (
+                <p className="text-red-500 text-sm">Remarks is required!</p>
+              )}
+              <div>
+                <label htmlFor="hearing-type" className="text-sm font-medium">
+                  Recommended Action Type
+                </label>
+                <Select
+                  id="hearing-type"
+                  className="mt-1"
+                  value={pendingType}
+                  onValueChange={(value) => setPendingType(value)}
+                >
+                  <SelectTrigger
+                    className={`rounded-e-none rounded-s-md ring-inset ${
+                      isInvalidPendingType &&
+                      !pendingType &&
+                      "ring-1 ring-red-500 focus-visible:ring-red-500"
+                    }`}
+                  >
+                    <SelectValue placeholder="Select Action type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Recommend For Suspension</SelectItem>
+                    <SelectItem value="0">
+                      Not Recommend For Suspension
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {isInvalidPendingType && !pendingType && (
+                <p className="text-red-500 text-sm">
+                  Recommendation is required!
+                </p>
+              )}
+              <div>
+                <label htmlFor="remarks" className="text-sm font-medium">
+                  Remarks
+                </label>
+                <Textarea
+                  id="remarks"
+                  placeholder="Enter your remarks here"
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  className={`rounded-e-none rounded-s-md ring-inset ${
+                    isInvalidRemarks &&
+                    !remarks &&
+                    "ring-1 ring-red-500 focus-visible:ring-red-500"
+                  }`}
+                />
+              </div>
+              <div className="flex justify-center">
+                <Button onClick={dlSuspensionRecommendationAction} size="sm">
+                  Submit Recommendation
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

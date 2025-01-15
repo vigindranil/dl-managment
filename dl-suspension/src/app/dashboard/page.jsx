@@ -148,52 +148,62 @@ const DashboardPage = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          <DashboardCard
-            title="Review Pending Suspensions"
-            count={dashboardCount?.NoOfPendingChallanOneWeek || 0}
-            day="(Last 7 Days)"
-            icon={AlertTriangle}
-            color="yellow"
-            link="/dl-suspensions/1"
-            description="Pending cases requiring attention"
-            total="Total (Archived)"
-            totalCount={dashboardCount?.NoOfPendingChallan || 0}
-          />
-          <DashboardCard
-            title="Disposed Suspensions"
-            count={dashboardCount?.NoChallanProcessedOneWeek || 0}
-            icon={CheckCircle2}
-            day="(Last 7 Days)"
-            color="emerald"
-            link="/dl-suspensions/4"
-            description="Successfully processed cases"
-            total="Total (Archived)"
-            totalCount={dashboardCount?.NoChallanProcessed || 0}
-          />
-          <DashboardCard
-            title="Scheduled Online Hearings"
-            count={dashboardCount?.NoOfOnlineHearingOneWeek || 0}
-            day="(Today)"
-            icon={Wifi}
-            color="sky"
-            link="/dl-suspensions/3"
-            description="Scheduled virtual hearings"
-            total="Total (Archived)"
-            totalCount={dashboardCount?.NoOfOnlineHearing || 0}
-          />
-          <DashboardCard
-            title="Offline Hearings"
-            count={dashboardCount?.NoOfOfflineHearingOneWeek || 0}
-            day="(Today)"
-            icon={WifiOff}
-            color="rose"
-            link="/dl-suspensions/2"
-            total="Total (Archived)"
-            totalCount={dashboardCount?.NoOfOfflineHearing || 0}
-            description="In-person hearing appointments"
-          />
-        </div>
+        <>
+          <h1 className="text-2xl font-bold text-slate-500 mb-0">
+            Recommendated Challan Details
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 border-b-[3px] py-4 mb-4">
+            <DashboardCard
+              title="Review Pending Suspensions"
+              count={dashboardCount?.NoOfPendingChallanOneWeek || 0}
+              day="(Last 7 Days)"
+              icon={AlertTriangle}
+              color="yellow"
+              link="/dl-suspensions/1"
+              description="Pending cases requiring attention"
+              total="Total (Archived)"
+              totalCount={dashboardCount?.NoOfPendingChallan || 0}
+            />
+            <DashboardCard
+              title="Disposed Suspensions"
+              count={dashboardCount?.NoChallanProcessedOneWeek || 0}
+              icon={CheckCircle2}
+              day="(Last 7 Days)"
+              color="emerald"
+              link="/dl-suspensions/4"
+              description="Successfully processed cases"
+              total="Total (Archived)"
+              totalCount={dashboardCount?.NoChallanProcessed || 0}
+            />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-500 mb-4">
+            Hearing Details
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            <DashboardCard
+              title="Scheduled Online Hearings"
+              count={dashboardCount?.NoOfOnlineHearingOneWeek || 0}
+              day="(Today)"
+              icon={Wifi}
+              color="sky"
+              link="/dl-suspensions/3"
+              description="Scheduled virtual hearings"
+              total="Total (Archived)"
+              totalCount={dashboardCount?.NoOfOnlineHearing || 0}
+            />
+            <DashboardCard
+              title="Offline Hearings"
+              count={dashboardCount?.NoOfOfflineHearingOneWeek || 0}
+              day="(Today)"
+              icon={WifiOff}
+              color="rose"
+              link="/dl-suspensions/2"
+              total="Total (Archived)"
+              totalCount={dashboardCount?.NoOfOfflineHearing || 0}
+              description="In-person hearing appointments"
+            />
+          </div>
+        </>
       )}
     </div>
   );

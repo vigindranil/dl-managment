@@ -73,6 +73,8 @@ function DataTableDemo({ type, range }) {
       result?.data && result?.data?.length == 0
         ? setApiData("")
         : setApiData(result.data);
+        console.log(result.data);
+        
     } catch (error) {
       console.error(error.message);
       setApiData(null);
